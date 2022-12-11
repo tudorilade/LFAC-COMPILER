@@ -1,0 +1,35 @@
+GLOBAL
+    be t: char;
+    be c: int;
+    be x: char, i: int;
+END_GLOBAL
+
+FUNC
+    def func(a: int, b: int) -> int;
+    def func1(d: int, y: int) -> int;
+    def func3() -> string;
+END_FUNC
+
+OBJECT
+    object MyObj1[
+        method func() -> string;
+    ];
+
+    object MyObj2[];
+
+    object MyObj3
+    [
+        attr d: int, y: char;
+        attr x: float;
+        
+        method func(c: int, d: int) -> int;
+        method func2(d: float, y:float) -> float;
+    ];
+END_OBJECT
+BEGIN_PROGRAM
+    be y: Myobj4{4, 6};
+    be x : Myobj{};
+    t := "c";
+END_PROGRAM
+
+
