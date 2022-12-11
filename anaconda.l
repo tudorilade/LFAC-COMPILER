@@ -6,6 +6,8 @@
 %%
 
 "be" {return DECLAR;}
+"of" {return OF;}
+"impl" {return IMPL;}
 
 "GLOBAL" {return GLOBAL;}
 "END_GLOBAL" {return ENDGLOBAL;}
@@ -22,10 +24,10 @@
 "method" {return DECLMETHOD;}
 "object" {return DECLOBJECT;}
 
-
-"int"|"float"|"char"|"string" {return TIP;}
 "BEGIN_PROGRAM" {return BGIN;}
 "END_PROGRAM" {return END;}
+
+"int"|"float"|"char"|"string" {return TIP;}
 
 [_a-zA-Z][_a-zA-Z0-9]* {return ID;}
 ":=" {return ASSIGN;}

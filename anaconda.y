@@ -8,6 +8,7 @@ extern int yylineno;
 %token GLOBAL ENDGLOBAL 
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
 %token FUNC ENDFUNC RTRNARROW FUNCDEF 
+%token IMPL OF
 %start progr
 %%
 progr: global func object_declar bloc_prog {printf("program corect sintactic\n");}
@@ -39,10 +40,11 @@ func_declar : fun ';'
      | func_declar fun ';'
      ;
 
-fun : FUNCDEF body_func 
+fun : FUNCDEF body_func
      ;
-body_func : ID '(' func_params ')' RTRNARROW TIP
-     | ID '(' ')' RTRNARROW TIP
+
+body_func : ID '(' func_params ')' RTRNARROW TIP body_instr
+     | ID '(' ')' RTRNARROW TIP body_instr
      ;
 
 func_params : func_param
@@ -52,9 +54,18 @@ func_params : func_param
 func_param : ID ':' TIP 
      ;
 
+body_instr : '{' list '}'
+     | '{' '}'
+     ;
+
+
 /* OBJECT SECTION */
-object_declar : OBJECT objects ENDOBJECT 
+object_declar : OBJECT declar_objects ENDOBJECT 
           ;
+
+declar_objects : 
+     | objects impl_methods declar_objects
+     ;
 
 objects : object ';'
      | objects object ';'
@@ -90,11 +101,29 @@ more_methods : method ';'
           | more_methods method ';'
           ;
 
-method : DECLMETHOD body_func
+method : DECLMETHOD body_method
      ;
 
-/* OBJECT INITIALIZATION */
+body_method : ID '(' method_params ')' RTRNARROW TIP
+     | ID '(' ')' RTRNARROW TIP
+     ;
 
+method_params : method_param
+     | method_params ',' method_param 
+     ;
+
+method_param : ID ':' TIP 
+     ;
+
+/* METHODS INITIALIZATION */
+impl_methods : impl_method ';'
+          | impl_methods impl_method
+          ;
+
+impl_method : IMPL body_method OF ID body_instr
+          ;
+
+/* OBJECT INITIALIZATION */
 obj_init : DECLAR some_objects
           ;
 
@@ -108,6 +137,7 @@ obj : ID ':' ID '{' init_list '}'
 
 init_list : init_par
      | init_list ',' init_par
+     ;
 
 init_par : ID 
      | NR
@@ -133,6 +163,7 @@ assigment : ID ASSIGN ID
          | ID ASSIGN '"' ID '"'
          | ID ASSIGN '"' NR '"'		 
          | ID '(' lista_apel ')'
+         ;
 
 
 

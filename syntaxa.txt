@@ -2,12 +2,18 @@ GLOBAL
     be t: char;
     be c: int;
     be x: char, i: int;
+    be tmp: int;
 END_GLOBAL
 
 FUNC
-    def func(a: int, b: int) -> int;
-    def func1(d: int, y: int) -> int;
-    def func3() -> string;
+    def func(a: int, b: int) -> int {};
+    def func1(d: int, y: int) -> int{
+        be y: MyObj4{};
+        c := 4;
+    };
+    def func3() -> string{
+        t := "u";
+    };
 END_FUNC
 
 OBJECT
@@ -25,7 +31,25 @@ OBJECT
         method func(c: int, d: int) -> int;
         method func2(d: float, y:float) -> float;
     ];
+
+    object MyObj5[
+        attr x: string, tmp: float;
+    ];
+
+    impl func(c: int, d: int) -> int of MyObj3 {
+         c := d;
+         tmp := 5;
+    };
+
+    object MyObj6[
+        attr x: string, tmp: float;
+        method func6() -> string;
+    ];
+
+    impl func6() -> string of MyObj6 {};
+    
 END_OBJECT
+
 BEGIN_PROGRAM
     be y: Myobj4{4, 6};
     be x : Myobj{};
