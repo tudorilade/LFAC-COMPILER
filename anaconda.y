@@ -12,6 +12,8 @@ extern int yylineno;
 %token IFCLUASE ELSECLAUSE ELIFCLAUSE WHILECLAUSE
 %token LESSOP LESSEQOP GREATEROP GREATEREQ NEQOP EQOP OROP
 %token ANDOP DIFFOP
+%left '+' '-'
+%left '*' '/'
 %start progr 
 %%
 progr: global func object_declar bloc_prog {printf("program corect sintactic\n");}
@@ -163,7 +165,7 @@ instructions :  instruction ';'
      ;
 
 /* instruction */
-instruction: assigment
+instruction: assigments
          | obj_init
          | clauses
          ;
@@ -200,7 +202,7 @@ op : LESSEQOP
      | DIFFOP
      ;
 
-assigment : ID ASSIGN arg		 
+assigments : ID ASSIGN arg		 
          | ID '(' lista_apel ')'
          | ID ASSIGN ID arg
          | DECLAR ID ':' TIP ASSIGN  arg
@@ -216,14 +218,25 @@ lista_apel : arg
            | lista_apel ',' arg
            ;
 
-arg : NR
-     | '"'NR'"'
-     | ID
-     | '"' ID '"'
-     | ID '(' lista_apel ')'
+arg :  ID '(' lista_apel ')'
      | ID RTRNARROW ID
      | ID RTRNARROW ID '(' lista_apel ')'
+     | expr
      ;
+
+expr : '[' expr ']' 
+     | expr '+' expr
+     | expr '-' expr
+     | expr '*' expr
+     | expr '/' expr
+     | '-' expr
+     | NR
+     | ID
+     | '"'NR'"'
+     | '"' ID '"'
+     ;
+
+
 %%
 int yyerror(char * s){
 printf("eroare: %s la linia:%d\n",s,yylineno);

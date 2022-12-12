@@ -66,7 +66,7 @@ END_OBJECT
 
 BEGIN_PROGRAM
     be y: Myobj3{"4", 6};
-    be x : Myobj{func1(1, 2), func2(3)};
+    be x: Myobj{func1(1, 2), func2(3)};
     t := "c";
     be x: int := 1;
     c := y->d;
@@ -88,6 +88,7 @@ BEGIN_PROGRAM
 
         if b and 5 {
             t := "c";
+            x := [c * 3] +[ c - 2] * 2;
         };
 
         while not x {
