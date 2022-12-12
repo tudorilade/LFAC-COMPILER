@@ -46,8 +46,13 @@ OBJECT
         method func6() -> string;
     ];
 
+        object MyObj6[
+        attr x: string, tmp: float;
+        method func6() -> string;
+    ];
+
     impl func6() -> string of MyObj6 {};
-    
+
 END_OBJECT
 
 BEGIN_PROGRAM
