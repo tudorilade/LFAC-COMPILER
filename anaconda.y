@@ -9,7 +9,10 @@ extern int yylineno;
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
 %token FUNC ENDFUNC RTRNARROW FUNCDEF 
 %token IMPL OF INHERIT
-%start progr
+%token IFCLUASE ELSECLAUSE ELIFCLAUSE WHILECLAUSE
+%token LESSOP LESSEQOP GREATEROP GREATEREQ NEQOP EQOP OROP
+%token ANDOP DIFFOP
+%start progr 
 %%
 progr: global func object_declar bloc_prog {printf("program corect sintactic\n");}
      ;
@@ -30,6 +33,7 @@ params : param
       ;
 
 param : ID ':' TIP
+     | ID '[' NR ']' ':' TIP
      ;
 
 /* FUNC SECTION */
@@ -54,7 +58,7 @@ func_params : func_param
 func_param : ID ':' TIP 
      ;
 
-body_instr : '{' list '}'
+body_instr : '{' instructions '}'
      | '{' '}'
      ;
 
@@ -149,31 +153,77 @@ init_par : ID
      ;
 
       
-/* bloc */
-bloc_prog : BGIN list END  
+/* program main */
+bloc_prog : BGIN instructions END  
      ;
      
-/* lista instructiuni */
-list :  statement ';' 
-     | list statement ';'
+/* instructions */
+instructions :  instruction ';' 
+     | instructions instruction ';'
      ;
 
-/* instructiune */
-statement: assigment
+/* instruction */
+instruction: assigment
          | obj_init
+         | clauses
          ;
 
-assigment : ID ASSIGN ID
-         | ID ASSIGN NR  
-         | ID ASSIGN '"' ID '"'
-         | ID ASSIGN '"' NR '"'		 
+clauses : IFCLUASE conditions body_if 
+     | IFCLUASE conditions body_if  ELIFCLAUSE conditions body_if  ELSECLAUSE body_if 
+     | IFCLUASE conditions body_if  ELIFCLAUSE conditions body_if
+     | IFCLUASE conditions body_if ELSECLAUSE body_if
+     | WHILECLAUSE conditions body_if
+     ;
+
+body_if : '{' body '}'
+     ;
+
+body : instructions
+     ;
+
+conditions : condition
+          | conditions condition
+          ;
+
+condition : DIFFOP arg
+          | arg op arg
+          ;
+
+op : LESSEQOP
+     | LESSOP
+     | GREATEROP
+     | GREATEREQ
+     | NEQOP
+     | EQOP
+     | OROP
+     | ANDOP
+     | DIFFOP
+     ;
+
+assigment : ID ASSIGN arg		 
          | ID '(' lista_apel ')'
+         | ID ASSIGN ID arg
+         | DECLAR ID ':' TIP ASSIGN  arg
+         | ID RTRNARROW ID '(' lista_apel ')'
+         | ID RTRNARROW ID ASSIGN arg
+         | DECLAR ID '[' NR ']' ':' TIP ASSIGN '{' lista_apel '}'
+         | ID '[' NR ']' ASSIGN '{' lista_apel '}'
+         | DECLAR ID '[' NR ']' ':' TIP
          ;
 
 
-lista_apel : NR
-           | lista_apel ',' NR
+lista_apel : arg
+           | lista_apel ',' arg
            ;
+
+arg : NR
+     | '"'NR'"'
+     | ID
+     | '"' ID '"'
+     | ID '(' lista_apel ')'
+     | ID RTRNARROW ID
+     | ID RTRNARROW ID '(' lista_apel ')'
+     ;
 %%
 int yyerror(char * s){
 printf("eroare: %s la linia:%d\n",s,yylineno);

@@ -25,6 +25,21 @@
 "object" {return DECLOBJECT;}
 "inherit" {return INHERIT;}
 
+"if" {return IFCLUASE;}
+"else" {return ELSECLAUSE;}
+"elif" {return ELIFCLAUSE;}
+"while" {return WHILECLAUSE;}
+
+"<" {return LESSOP;}
+"=<" {return LESSEQOP;}
+">" {return GREATEROP;}
+">=" {return GREATEREQ;}
+"!=" {return NEQOP;}
+"==" {return EQOP;}
+"or" {return OROP;}
+"and" {return ANDOP;}
+"not" {return DIFFOP;}
+
 "BEGIN_PROGRAM" {return BGIN;}
 "END_PROGRAM" {return END;}
 
