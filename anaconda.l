@@ -23,6 +23,7 @@
 "attr" {return DECLATTR;}
 "method" {return DECLMETHOD;}
 "object" {return DECLOBJECT;}
+"inherit" {return INHERIT;}
 
 "BEGIN_PROGRAM" {return BGIN;}
 "END_PROGRAM" {return END;}

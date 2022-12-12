@@ -8,7 +8,7 @@ extern int yylineno;
 %token GLOBAL ENDGLOBAL 
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
 %token FUNC ENDFUNC RTRNARROW FUNCDEF 
-%token IMPL OF
+%token IMPL OF INHERIT
 %start progr
 %%
 progr: global func object_declar bloc_prog {printf("program corect sintactic\n");}
@@ -73,6 +73,8 @@ objects : object ';'
 
 object : DECLOBJECT ID '[' inside_obj ']'
      | DECLOBJECT ID '[' ']'
+     | DECLOBJECT ID ':' INHERIT ID '[' inside_obj ']'
+     | DECLOBJECT ID ':' INHERIT ID  '[' ']'
      ;
 
 /* OBJECT STRUCTURE */
@@ -139,9 +141,17 @@ init_list : init_par
      | init_list ',' init_par
      ;
 
-init_par : ID 
-     | NR
+init_par : | symbols
+     | func_call
      ;
+
+symbols : ID 
+     | NR
+     | '"'ID'"'
+     | '"'NR'"'
+     ;
+
+func_call : ID '(' symbols ')'
 
       
 /* bloc */

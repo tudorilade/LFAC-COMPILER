@@ -66,7 +66,10 @@ extern int yydebug;
     FUNC = 272,
     ENDFUNC = 273,
     RTRNARROW = 274,
-    FUNCDEF = 275
+    FUNCDEF = 275,
+    IMPL = 276,
+    OF = 277,
+    INHERIT = 278
   };
 #endif
 /* Tokens.  */
@@ -88,6 +91,9 @@ extern int yydebug;
 #define ENDFUNC 273
 #define RTRNARROW 274
 #define FUNCDEF 275
+#define IMPL 276
+#define OF 277
+#define INHERIT 278
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
