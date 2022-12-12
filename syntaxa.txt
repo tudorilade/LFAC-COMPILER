@@ -61,12 +61,11 @@ OBJECT
     ];
 
     impl func(c: int, d: int) -> int of Myobj11{};
-
 END_OBJECT
 
 BEGIN_PROGRAM
     be y: Myobj4{"4", 6};
-    be x : Myobj{func1(1, 2), func2("c")};
+    be x : Myobj{func1(1, 2), func2(3)};
     t := "c";
 END_PROGRAM
 

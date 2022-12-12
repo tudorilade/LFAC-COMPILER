@@ -141,17 +141,12 @@ init_list : init_par
      | init_list ',' init_par
      ;
 
-init_par : | symbols
-     | func_call
-     ;
-
-symbols : ID 
+init_par : ID 
      | NR
      | '"'ID'"'
      | '"'NR'"'
+     | ID '(' lista_apel ')'
      ;
-
-func_call : ID '(' symbols ')'
 
       
 /* bloc */
@@ -174,7 +169,6 @@ assigment : ID ASSIGN ID
          | ID ASSIGN '"' NR '"'		 
          | ID '(' lista_apel ')'
          ;
-
 
 
 lista_apel : NR
