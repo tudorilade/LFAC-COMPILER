@@ -25,13 +25,14 @@
 "object" {return DECLOBJECT;}
 "inherit" {return INHERIT;}
 
-"if" {return IFCLUASE;}
+"if" {return IFCLAUSE;}
 "else" {return ELSECLAUSE;}
 "elif" {return ELIFCLAUSE;}
 "while" {return WHILECLAUSE;}
+"for" {return FORCLAUSE;}
 
 "<" {return LESSOP;}
-"=<" {return LESSEQOP;}
+"<=" {return LESSEQOP;}
 ">" {return GREATEROP;}
 ">=" {return GREATEREQ;}
 "!=" {return NEQOP;}
@@ -39,11 +40,13 @@
 "or" {return OROP;}
 "and" {return ANDOP;}
 "not" {return DIFFOP;}
+"true" {return TRUEP;}
+"false" {return FALSEP;}
 
 "BEGIN_PROGRAM" {return BGIN;}
 "END_PROGRAM" {return END;}
 
-"int"|"float"|"char"|"string" {return TIP;}
+"int"|"float"|"char"|"string"|"bool" {return TIP;}
 
 [_a-zA-Z][_a-zA-Z0-9]* {return ID;}
 ":=" {return ASSIGN;}

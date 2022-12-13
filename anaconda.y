@@ -9,11 +9,13 @@ extern int yylineno;
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
 %token FUNC ENDFUNC RTRNARROW FUNCDEF 
 %token IMPL OF INHERIT
-%token IFCLUASE ELSECLAUSE ELIFCLAUSE WHILECLAUSE
+%token IFCLAUSE ELSECLAUSE ELIFCLAUSE WHILECLAUSE FORCLAUSE
 %token LESSOP LESSEQOP GREATEROP GREATEREQ NEQOP EQOP OROP
-%token ANDOP DIFFOP
+%token ANDOP DIFFOP TRUEP FALSEP 
 %left '+' '-'
 %left '*' '/'
+%right DIFFOP
+%left LESSOP LESSEQOP GREATEROP GREATEREQ EQOP OROP ANDOP NEQOP
 %start progr 
 %%
 progr: global func object_declar bloc_prog {printf("program corect sintactic\n");}
@@ -60,7 +62,7 @@ func_params : func_param
 func_param : ID ':' TIP 
      ;
 
-body_instr : '{' instructions '}'
+body_instr : body_if
      | '{' '}'
      ;
 
@@ -112,15 +114,8 @@ more_methods : method ';'
 method : DECLMETHOD body_method
      ;
 
-body_method : ID '(' method_params ')' RTRNARROW TIP
+body_method : ID '(' func_params ')' RTRNARROW TIP
      | ID '(' ')' RTRNARROW TIP
-     ;
-
-method_params : method_param
-     | method_params ',' method_param 
-     ;
-
-method_param : ID ':' TIP 
      ;
 
 /* METHODS INITIALIZATION */
@@ -134,24 +129,11 @@ impl_method : IMPL body_method OF ID body_instr
 /* OBJECT INITIALIZATION */
 obj_init : DECLAR some_objects
           ;
-
 some_objects : obj 
      | some_objects ',' obj
      ;
-
-obj : ID ':' ID '{' init_list '}'
+obj : ID ':' ID '{' lista_apel '}'
      | ID ':' ID '{' '}'
-     ;
-
-init_list : init_par
-     | init_list ',' init_par
-     ;
-
-init_par : ID 
-     | NR
-     | '"'ID'"'
-     | '"'NR'"'
-     | ID '(' lista_apel ')'
      ;
 
       
@@ -170,57 +152,39 @@ instruction: assigments
          | clauses
          ;
 
-clauses : IFCLUASE conditions body_if 
-     | IFCLUASE conditions body_if  ELIFCLAUSE conditions body_if  ELSECLAUSE body_if 
-     | IFCLUASE conditions body_if  ELIFCLAUSE conditions body_if
-     | IFCLUASE conditions body_if ELSECLAUSE body_if
-     | WHILECLAUSE conditions body_if
+clauses : IFCLAUSE expr body_if 
+     | IFCLAUSE expr body_if  ELIFCLAUSE expr body_if  ELSECLAUSE body_if 
+     | IFCLAUSE expr body_if  ELIFCLAUSE expr body_if
+     | IFCLAUSE expr body_if ELSECLAUSE body_if
+     | WHILECLAUSE expr body_if
+     | FORCLAUSE assigments ';' expr ';' assigments body_if
      ;
 
-body_if : '{' body '}'
+body_if : '{' instructions '}'
      ;
 
-body : instructions
-     ;
-
-conditions : condition
-          | conditions condition
-          ;
-
-condition : DIFFOP arg
-          | arg op arg
-          ;
-
-op : LESSEQOP
-     | LESSOP
-     | GREATEROP
-     | GREATEREQ
-     | NEQOP
-     | EQOP
-     | OROP
-     | ANDOP
-     | DIFFOP
-     ;
-
-assigments : ID ASSIGN arg		 
+assigments : var ASSIGN arg
          | ID '(' lista_apel ')'
-         | ID ASSIGN ID arg
-         | DECLAR ID ':' TIP ASSIGN  arg
          | ID RTRNARROW ID '(' lista_apel ')'
-         | ID RTRNARROW ID ASSIGN arg
-         | DECLAR ID '[' NR ']' ':' TIP ASSIGN '{' lista_apel '}'
-         | ID '[' NR ']' ASSIGN '{' lista_apel '}'
          | DECLAR ID '[' NR ']' ':' TIP
+         | ID '[' NR ']'
          ;
+
+var : ID
+     | ID '(' lista_apel ')' 
+     | DECLAR ID ':' TIP
+     | ID RTRNARROW ID
+     | ID '[' NR ']'
+     | DECLAR ID '[' NR ']' ':' TIP
+     ;
+
 
 
 lista_apel : arg
            | lista_apel ',' arg
            ;
 
-arg :  ID '(' lista_apel ')'
-     | ID RTRNARROW ID
-     | ID RTRNARROW ID '(' lista_apel ')'
+arg : '{' lista_apel '}'
      | expr
      ;
 
@@ -229,13 +193,32 @@ expr : '[' expr ']'
      | expr '-' expr
      | expr '*' expr
      | expr '/' expr
+     | DIFFOP expr
+     | expr LESSEQOP expr
+     | expr GREATEREQ expr
+     | expr LESSOP expr
+     | expr GREATEROP expr
+     | expr ANDOP expr
+     | expr OROP expr
+     | expr NEQOP expr
+     | expr EQOP expr
      | '-' expr
-     | NR
-     | ID
-     | '"'NR'"'
-     | '"' ID '"'
+     | primitives
      ;
 
+
+primitives : NR
+     | '"' ID '"'
+     | '"' NR '"'
+     | ID
+     | TRUEP
+     | FALSEP
+     | ID RTRNARROW ID
+     | ID RTRNARROW ID '(' lista_apel ')'
+     | ID RTRNARROW ID '(' ')'
+     | ID '(' lista_apel ')'
+     | ID '(' ')'
+     ;
 
 %%
 int yyerror(char * s){
