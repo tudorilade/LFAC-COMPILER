@@ -69,7 +69,24 @@ extern int yydebug;
     FUNCDEF = 275,
     IMPL = 276,
     OF = 277,
-    INHERIT = 278
+    INHERIT = 278,
+    IFCLAUSE = 279,
+    ELSECLAUSE = 280,
+    ELIFCLAUSE = 281,
+    WHILECLAUSE = 282,
+    FORCLAUSE = 283,
+    LESSOP = 284,
+    LESSEQOP = 285,
+    GREATEROP = 286,
+    GREATEREQ = 287,
+    NEQOP = 288,
+    EQOP = 289,
+    OROP = 290,
+    ANDOP = 291,
+    DIFFOP = 292,
+    TRUEP = 293,
+    FALSEP = 294,
+    COMMENT = 295
   };
 #endif
 /* Tokens.  */
@@ -94,6 +111,23 @@ extern int yydebug;
 #define IMPL 276
 #define OF 277
 #define INHERIT 278
+#define IFCLAUSE 279
+#define ELSECLAUSE 280
+#define ELIFCLAUSE 281
+#define WHILECLAUSE 282
+#define FORCLAUSE 283
+#define LESSOP 284
+#define LESSEQOP 285
+#define GREATEROP 286
+#define GREATEREQ 287
+#define NEQOP 288
+#define EQOP 289
+#define OROP 290
+#define ANDOP 291
+#define DIFFOP 292
+#define TRUEP 293
+#define FALSEP 294
+#define COMMENT 295
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

@@ -50,9 +50,8 @@
 
 [_a-zA-Z][_a-zA-Z0-9]* {return ID;}
 ":=" {return ASSIGN;}
-[0-9]+ {return NR;}
+[1-9][0-9]*|0 {return NR;}
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}
 
- 
