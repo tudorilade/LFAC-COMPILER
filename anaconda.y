@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "anaconda.h"
+//#include "anaconda.h"
 
 extern FILE* yyin;
 extern FILE* yyout;
@@ -12,22 +12,11 @@ extern int ylex();
 %}
 
 %union {
-    int int_val;
-    double float_val;
-    char bool_val[6];
-    char char_val;
-    char *str_val;
-    struct symbol_table *symbol;
+    struct symbol_table *s;
 }
 
-%token <symbol> ID 
-%token <int_val> INT
-%token <float_val> FLOAT
-%token <bool_val> BOOL
-%token <char_val> CHAR
-%token <str_val> STRING
-%token INTTYPE FLOATTYPE BOOLTYPE CHARTYPE STRINGTYPE
-%token BGIN END ASSIGN NR DECLAR
+%token ID 
+%token TIP BGIN END ASSIGN NR DECLAR
 %token GLOBAL ENDGLOBAL 
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
 %token FUNC ENDFUNC RTRNARROW FUNCDEF 
@@ -59,7 +48,7 @@ params : param
        | params ',' param
        ;
 
-param : ID ':' TIP
+param : ID ':' TIP 
       | ID '[' NR ']' ':' TIP
       ;
 
@@ -241,12 +230,6 @@ primitives : NR
            | ID '(' ')'
            ;
 
-TIP : INTTYPE 
-    | FLOATTYPE
-    | BOOLTYPE
-    | CHARTYPE
-    | STRINGTYPE
-    ;
 %%
 int yyerror(char * s)
 {
@@ -263,13 +246,13 @@ int main(int argc, char *argv[])
         yyin = fopen(argv[1], "r");
         if (yyin == NULL)
         {
-            printf("Cannot open file %s!\n", argv[1]);
+            printf("Cannot open file %s!", argv[1]);
             return 1;
         }
     }
     else
     {
-        printf("No input file!\n");
+        printf("No input file!");
         return 1;
     }
 

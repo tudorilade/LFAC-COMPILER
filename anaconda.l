@@ -1,10 +1,13 @@
 %{
 #include <stdio.h>
 #include "y.tab.h"
-//#include "anaconda.h"
+#include "anaconda.h"
 
 extern FILE *yyin;
 extern FILE *yyout;
+
+void pprint(char *token_type);
+void yyerror(char *s);
 %}
 
 %option noyywrap
@@ -51,30 +54,18 @@ extern FILE *yyout;
 "BEGIN_PROGRAM" {return BGIN;}
 "END_PROGRAM" {return END;}
 
-"int" {return INTTYPE;}
-"float" {return FLOATTYPE;}
-"char" {return CHARTYPE;}
-"string" {return STRINGTYPE;}
-"bool" {return BOOLTYPE;}
+"int"|"float"|"char"|"string"|"bool" {return TIP;}
 
 [_a-zA-Z][_a-zA-Z0-9]* { 
                             if (lookup_symbol(yytext) == NULL && lookup_symbol_in_scope(yytext, -1) == NULL) 
                                 insert_symbol(yytext, 2, -1, -1, -1, -1, -1);
-                            yylval.symbol = lookup_symbol(yytext);
-                                                    
+                            yylval.s = lookup_symbol(yytext);
+                                
                             return ID;
                         }
-[1-9][0-9]*|0 { yylval.int_val = atoi(yytext); return INT; }
-[1-9][0-9]*|0*\.[0-9]+ { yylval.float_val = atof(yytext); return FLOAT; }
-\".\" { yylval.char_val = yytext[0]; return CHAR; }
-\".*\" { 
-            yylval.str_val = malloc(strlen(yytext) + 1); 
-            strcpy(yylval.str_val, yytext); 
-            return STRING; 
-        }
 ":=" {return ASSIGN;}
+[1-9][0-9]*|0 {return NR;}
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}
-
 %%
