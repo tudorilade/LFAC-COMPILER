@@ -1,1 +1,3 @@
-int 1 (null) 0 0
+Name      	Type      	Scope     	Value      	ArraySize	NrOfParams
+----------------------------------------------------------------------
+t         	Function  	Global    	N\A       	N\A       	-1        

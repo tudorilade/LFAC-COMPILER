@@ -1,0 +1,7 @@
+GLOBAL
+    be t: char;
+    be c: int;
+    be x: char, i: int;
+    be tmp: int;
+    be t: bool;
+END_GLOBAL

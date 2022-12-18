@@ -5,11 +5,29 @@
 #include "anaconda.h"
 
 extern FILE* yyin;
-extern char* yytext;
+extern FILE* yyout;
 extern int yylineno;
+extern char* yytext;
+extern int ylex();
 %}
 
-%token ID TIP BGIN END ASSIGN NR DECLAR
+%union {
+    int int_val;
+    double float_val;
+    char bool_val[6];
+    char char_val;
+    char *str_val;
+    struct symbol_table *symbol;
+}
+
+%token <symbol> ID 
+%token <int_val> INT
+%token <float_val> FLOAT
+%token <bool_val> BOOL
+%token <char_val> CHAR
+%token <str_val> STRING
+%token INTTYPE FLOATTYPE BOOLTYPE CHARTYPE STRINGTYPE
+%token BGIN END ASSIGN NR DECLAR
 %token GLOBAL ENDGLOBAL 
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
 %token FUNC ENDFUNC RTRNARROW FUNCDEF 
@@ -41,8 +59,8 @@ params : param
        | params ',' param
        ;
 
-param : ID ':' TIP { if (!lookup($1, 0)) insert($1, 0, $3, 0, 0); }   //name = ID, dataType = 0 (variabila globala :-?), type = TIP, value = 0 (:-?), inDataType = 0 (aka in main :-?)
-      | ID '[' NR ']' ':' TIP //{if (!lookup($1, 1)) insert($1, 1, $5, $3, 0);}  //name = ID, dataType = 1 (vector global :-?), type = TIP, value = NR (lungimea vactorului), inDataType = 0 (aka in main :-?)
+param : ID ':' TIP
+      | ID '[' NR ']' ':' TIP
       ;
 
 /* FUNC SECTION */
@@ -56,15 +74,15 @@ func_declar : fun ';'
 fun : FUNCDEF body_func
     ;
 
-body_func : ID '(' func_params ')' RTRNARROW TIP body_instr //{if (!lookup($1, 2)) insert($1, 2, $6, 0, 0);} //dataType = 2, type = TIP, value = 0 (:-?), inDataType = 0 (aka in main :-?)
-          | ID '(' ')' RTRNARROW TIP body_instr //{if (!lookup($1, 2)) insert($1, 2, $5, 0, 0);} //dataType = 2, type = TIP, value = 0 (:-?), inDataType = 0 (aka in main :-?)
+body_func : ID '(' func_params ')' RTRNARROW TIP body_instr
+          | ID '(' ')' RTRNARROW TIP body_instr
           ;
 
 func_params : func_param
             | func_params ',' func_param 
             ;
 
-func_param : ID ':' TIP //{if (!lookup($1, 0)) insert($1, 3, $3, 0, 1);} //dataType = 0, type = TIP, value = 0 (:-?), inDataType = 1 (aka in functie)
+func_param : ID ':' TIP
            ;
 
 body_instr : body_if
@@ -223,12 +241,45 @@ primitives : NR
            | ID '(' ')'
            ;
 
+TIP : INTTYPE 
+    | FLOATTYPE
+    | BOOLTYPE
+    | CHARTYPE
+    | STRINGTYPE
+    ;
 %%
-int yyerror(char * s){
-printf("eroare: %s la linia:%d\n",s,yylineno);
+int yyerror(char * s)
+{
+    printf("eroare: %s la linia: %d\n", s, yylineno);
 }
 
-int main(int argc, char** argv){
-yyin=fopen(argv[1],"r");
-yyparse();
-} 
+
+int main(int argc, char *argv[])
+{
+    init_symbol_table();
+
+    if (argc)
+    {
+        yyin = fopen(argv[1], "r");
+        if (yyin == NULL)
+        {
+            printf("Cannot open file %s!\n", argv[1]);
+            return 1;
+        }
+    }
+    else
+    {
+        printf("No input file!\n");
+        return 1;
+    }
+
+    yyparse();
+
+    fclose(yyin);
+
+    yyout = fopen("symbol_table.txt", "w");
+    print_symbol_table(yyout);
+    fclose(yyout);
+
+    return 0;
+}
