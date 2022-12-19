@@ -51,16 +51,16 @@ extern int yydebug;
   {
     ID = 258,
     INT = 259,
-    FLOAT = 260,
-    BOOL = 261,
-    CHAR = 262,
-    STRING = 263,
-    ARRAY = 264,
-    TIP = 265,
-    BGIN = 266,
-    END = 267,
-    ASSIGN = 268,
-    NR = 269,
+    NR = 260,
+    FLOAT = 261,
+    BOOL = 262,
+    CHAR = 263,
+    STRING = 264,
+    ARRAY = 265,
+    TIP = 266,
+    BGIN = 267,
+    END = 268,
+    ASSIGN = 269,
     DECLAR = 270,
     GLOBAL = 271,
     ENDGLOBAL = 272,
@@ -98,16 +98,16 @@ extern int yydebug;
 /* Tokens.  */
 #define ID 258
 #define INT 259
-#define FLOAT 260
-#define BOOL 261
-#define CHAR 262
-#define STRING 263
-#define ARRAY 264
-#define TIP 265
-#define BGIN 266
-#define END 267
-#define ASSIGN 268
-#define NR 269
+#define NR 260
+#define FLOAT 261
+#define BOOL 262
+#define CHAR 263
+#define STRING 264
+#define ARRAY 265
+#define TIP 266
+#define BGIN 267
+#define END 268
+#define ASSIGN 269
 #define DECLAR 270
 #define GLOBAL 271
 #define ENDGLOBAL 272
@@ -145,7 +145,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 19 "anaconda.y"
+#line 20 "anaconda.y"
 
     int int_val;
     double float_val;

@@ -10,9 +10,10 @@ extern int yylineno;
 extern char* yytext;
 extern int ylex();
 
-void insert_symbol(char *name, int dataType, int type, int scope, int value, int arraySize, int numberOfParameters);
-struct symbol *lookup_symbol_in_scope(char *name, int scope);
+void insert_symbol(char *name, int dataType, char *type, int value, int arraySize, int numberOfParameters);
+struct symbol *lookup_symbol(char *name);
 void print_symbol_table(FILE *file);
+void prevDefinedErr(char *name);
 int countpf;
 %}
 
@@ -26,13 +27,14 @@ int countpf;
 }
 
 %token <str_val> ID
-%token <int_val> INT
+%token <int_val> INT NR
 %token <float_val> FLOAT
 %token <bool_val> BOOL
 %token <char_val> CHAR
 %token <str_val> STRING
 %token ARRAY
-%token <int_val> TIP BGIN END ASSIGN NR DECLAR
+%token <str_val> TIP 
+%token BGIN END ASSIGN DECLAR
 %token GLOBAL ENDGLOBAL 
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
 %token <s> FUNC 
@@ -50,7 +52,7 @@ int countpf;
 %left LESSOP LESSEQOP GREATEROP GREATEREQ EQOP OROP ANDOP NEQOP
 %start progr 
 %%
-progr: global func object_declar bloc_prog {printf("Program corect sintactic!\n");}
+progr: global func object_declar bloc_prog  { printf("Syntactically correct program!\n"); }
      ;
 
 /* GLOBAL VAR SECTION */
@@ -68,20 +70,20 @@ params : param
        | params ',' param
        ;
 
-param : ID ':' TIP { 
-                        if (lookup_symbol_in_scope($1, 0) != NULL) {
-                            printf("Eroare la linia %d: variabila %s este declarata de mai multe ori\n", yylineno, $1); exit(1);
-                        } else {
-                            insert_symbol($1, 0, $3, 0, 0, 0, 0);
-                        }
-                    }
-      | ID '[' NR ']' ':' TIP { 
-                                  if (lookup_symbol_in_scope($1, 0) != NULL) {
-                                      printf("Eroare la linia %d: variabila %s este declarata de mai multe ori\n", yylineno, $1); exit(1);
-                                  } else {
-                                      insert_symbol($1, 0, $6, 0, 0, $3, 0);
-                                  }
-                              }
+param : ID ':' TIP              { 
+                                    if (lookup_symbol($1) != NULL) {
+                                        prevDefinedErr($1);
+                                    } else {
+                                        insert_symbol($1, 0, $3, 0, 0, 0);
+                                    }
+                                }
+      | ID '[' NR ']' ':' TIP   { 
+                                    if (lookup_symbol($1) != NULL) {
+                                        prevDefinedErr($1);
+                                    } else {
+                                        insert_symbol($1, 1, $6, 0, 0, $3);
+                                    }
+                                }
       ;
 
 /* FUNC SECTION */
@@ -95,30 +97,34 @@ func_declar : fun ';'
 fun : FUNCDEF body_func
     ;
 
-body_func : ID '(' func_params ')' RTRNARROW TIP body_instr {   
-                                                                countpf = 0;
-                                                                if (lookup_symbol_in_scope($1, 0) != NULL) {
-                                                                    printf("Eroare la linia %d: variabila %s este declarata de mai multe ori\n", yylineno, $1); exit(1);
+body_func : ID '(' func_params ')' RTRNARROW TIP body_instr {
+                                                                if (lookup_symbol($1) != NULL) {
+                                                                    prevDefinedErr($1);
                                                                 } else {
-                                                                    insert_symbol($1, 2, $6, 0, 0, 0, countpf);
+                                                                    insert_symbol($1, 2, $6, 0, 0, countpf);
+                                                                }
+                                                                countpf = 0;
+                                                            }
+          | ID '(' ')' RTRNARROW TIP body_instr             {              
+                                                                if (lookup_symbol($1) != NULL) {
+                                                                    prevDefinedErr($1);
+                                                                } else {
+                                                                    insert_symbol($1, 2, $5, 0, 0, 0);
                                                                 }
                                                             }
-          | ID '(' ')' RTRNARROW TIP body_instr {   
-                                                    if (lookup_symbol_in_scope($1, 0) != NULL) {
-                                                        printf("Eroare la linia %d: variabila %s este declarata de mai multe ori\n", yylineno, $1); exit(1);
-                                                    } else {
-                                                        insert_symbol($1, 2, $5, 0, 0, 0, 0);
-                                                    }
-                                                }
           ;
 
-func_params : func_param    { countpf++; }
-            | func_params ',' func_param { countpf += 2; }
+func_params : func_param                                    { countpf++; }
+            | func_params ',' func_param                    { countpf++; }
             ;
 
-func_param : ID ':' TIP {   
-                            //cam discutabil aici pentru ca mai multe functii pot avea aeiasi parametri
-                        }
+func_param : ID ':' TIP                                     {   
+                                                                if (lookup_symbol($1) != NULL) {
+                                                                    prevDefinedErr($1);
+                                                                } else {
+                                                                    insert_symbol($1, 0, $3, 0, 0, 0);
+                                                                }
+                                                            }
            ;
 
 body_instr : body_if
@@ -231,7 +237,6 @@ assigments : var ASSIGN arg
            ;
 
 var : ID
-    | ID '(' lista_apel ')' 
     | DECLAR ID ':' TIP
     | ID RTRNARROW ID
     | ID '[' NR ']'
@@ -280,9 +285,13 @@ primitives : NR
 %%
 int yyerror(char * s)
 {
-    printf("eroare: %s la linia: %d\n", s, yylineno);
+    printf("Error: %s at line: %d\n!", s, yylineno);
 }
 
+void prevDefinedErr(char *s)
+{
+    printf("Error: %s is already defined at line: %d!\n", s, yylineno);
+}
 
 int main(int argc, char *argv[])
 {

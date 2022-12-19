@@ -6,7 +6,6 @@ extern FILE *yyin;
 extern FILE *yyout;
 
 void pprint(char *token_type);
-void yyerror(char *s);
 %}
 
 %option noyywrap
@@ -53,7 +52,8 @@ void yyerror(char *s);
 "BEGIN_PROGRAM" {return BGIN;}
 "END_PROGRAM" {return END;}
 
-"int"|"float"|"char"|"string"|"bool" {return TIP;}
+"int"|"float"|"char"|"string"|"bool" {yylval.str_val = (char*)malloc(strlen(yytext) + 1); 
+            strcpy(yylval.str_val, yytext);  return TIP;}
 
 [_a-zA-Z][_a-zA-Z0-9]* {yylval.str_val = strdup(yytext); return ID;}
 [1-9][0-9]*|0 { yylval.int_val = atoi(yytext); return INT; }

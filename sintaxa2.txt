@@ -7,7 +7,7 @@ END_GLOBAL
 
 FUNC
     def func(a: int, b: int) -> int {};
-    def func1(d: int, y: int) -> int{
+    def func1(d: int, y: int, dsyd: float) -> int{
         be y: MyObj4{};
     };
 
@@ -16,7 +16,6 @@ END_FUNC
 OBJECT
     object MyObj1[
     ];
-
     object MyObj2[];
 
     object MyObj3

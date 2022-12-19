@@ -1,7 +1,14 @@
-Name      	Type      	Scope     	Value      	ArraySize	NrOfParams
+Name      	DataType  	Type      	Value      	ArraySize	NrOfParams
 ----------------------------------------------------------------------
-tmp       	Variable  	Global    	0         	N\A       	N\A       
-i         	Variable  	Global    	0         	N\A       	N\A       
-x         	Variable  	Global    	0         	N\A       	N\A       
-c         	Variable  	Global    	0         	N\A       	N\A       
-t         	Variable  	Global    	0         	N\A       	N\A       
+func1     	Function  	int       	N\A       	N\A       	3         
+dsyd      	Variable  	float     	0         	N\A       	N\A       
+y         	Variable  	int       	0         	N\A       	N\A       
+d         	Variable  	int       	0         	N\A       	N\A       
+func      	Function  	int       	N\A       	N\A       	2         
+b         	Variable  	int       	0         	N\A       	N\A       
+a         	Variable  	int       	0         	N\A       	N\A       
+tmp       	Variable  	int       	0         	N\A       	N\A       
+i         	Variable  	int       	0         	N\A       	N\A       
+x         	Variable  	char      	0         	N\A       	N\A       
+c         	Variable  	int       	0         	N\A       	N\A       
+t         	Variable  	char      	0         	N\A       	N\A       
