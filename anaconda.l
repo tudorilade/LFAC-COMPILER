@@ -57,7 +57,7 @@ void pprint(char *token_type);
 
 [_a-zA-Z][_a-zA-Z0-9]* {yylval.str_val = strdup(yytext); return ID;}
 [1-9][0-9]*|0 { yylval.int_val = atoi(yytext); return INT; }
-[1-9][0-9]*|0*\.[0-9]+ { yylval.float_val = atof(yytext); return FLOAT; }
+[1-9][0-9]*\.[0-9]+|0*\.[0-9]+ { yylval.float_val = atof(yytext); return FLOAT; }
 \".\" { yylval.char_val = yytext[0]; return CHAR; }
 \".*\" { 
             yylval.str_val = (char*)malloc(strlen(yytext) + 1); 
@@ -66,8 +66,6 @@ void pprint(char *token_type);
         }
 [a-zA-Z]*\[[1-9][0-9]*|0\] {return ARRAY;}
 ":=" {return ASSIGN;}
-[1-9][0-9]*|0 { return INT; }
-[1-9][0-9]*\.[0-9]+|0*\.[0-9]+ { return FLOAT; }
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}

@@ -27,7 +27,7 @@ int countpf;
 }
 
 %token <str_val> ID
-%token <int_val> INT NR
+%token <int_val> INT 
 %token <float_val> FLOAT
 %token <bool_val> BOOL
 %token <char_val> CHAR
@@ -77,7 +77,7 @@ param : ID ':' TIP              {
                                         insert_symbol($1, 0, $3, 0, 0, 0);
                                     }
                                 }
-      | ID '[' NR ']' ':' TIP   { 
+      | ID '[' INT ']' ':' TIP   { 
                                     if (lookup_symbol($1) != NULL) {
                                         prevDefinedErr($1);
                                     } else {
