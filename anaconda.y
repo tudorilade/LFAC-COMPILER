@@ -184,7 +184,6 @@ assigments : var ASSIGN arg
            ;
 
 var : ID
-    | ID '(' lista_apel ')' 
     | DECLAR ID ':' TIP
     | ID RTRNARROW ID
     | ID '[' INT ']'
@@ -230,6 +229,7 @@ primitives : INT
            | ID RTRNARROW ID '(' ')'
            | ID '(' lista_apel ')'
            | ID '(' ')'
+           | ID '[' INT ']'
            ;
 
 %%

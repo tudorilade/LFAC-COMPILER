@@ -97,7 +97,7 @@ BEGIN_PROGRAM
             x := [c * 3] + [c - 2] * 2;
         };
 
-        while [not c != 1+2] and [d <= 5] or [d != false and x >= 3]{
+        while [not c != 1+2] and [d+func(1, func(3) + 6) <= a[5]] or [d != false and x >= 3]{
             x := 1;
 
             if b < 5 {
@@ -115,11 +115,11 @@ BEGIN_PROGRAM
             };
         };
 
-        for x:=4; x <= 10; x := x + 1{
+        for x:=4+func(1); x+1 <= 10; x := x + 1{
 
             if [b + 4] and not 5 {
                 t := "c";
-                x := [c * 3] + [ c - 2] * 2;
+                x := [c * 3] +  [c - 2] * 2;
             };
 
         };
