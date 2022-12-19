@@ -2,35 +2,55 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include "anaconda.h"
+#include "anaconda.h"
 
 extern FILE* yyin;
 extern FILE* yyout;
 extern int yylineno;
 extern char* yytext;
 extern int ylex();
+
+void insert_symbol(char *name, int dataType, int type, int scope, int value, int arraySize, int numberOfParameters);
+struct symbol *lookup_symbol_in_scope(char *name, int scope);
+void print_symbol_table(FILE *file);
+int countpf;
 %}
 
 %union {
+    int int_val;
+    double float_val;
+    char *bool_val;
+    char char_val;
+    char *str_val;
     struct symbol_table *s;
 }
 
-%token ID 
-%token TIP BGIN END ASSIGN NR DECLAR
+%token <str_val> ID
+%token <int_val> INT
+%token <float_val> FLOAT
+%token <bool_val> BOOL
+%token <char_val> CHAR
+%token <str_val> STRING
+%token ARRAY
+%token <int_val> TIP BGIN END ASSIGN NR DECLAR
 %token GLOBAL ENDGLOBAL 
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
-%token FUNC ENDFUNC RTRNARROW FUNCDEF 
+%token <s> FUNC 
+%token ENDFUNC RTRNARROW FUNCDEF 
 %token IMPL OF INHERIT
 %token IFCLAUSE ELSECLAUSE ELIFCLAUSE WHILECLAUSE FORCLAUSE
 %token LESSOP LESSEQOP GREATEROP GREATEREQ NEQOP EQOP OROP
 %token ANDOP DIFFOP TRUEP FALSEP COMMENT
+
+%type <s> param body_func
+
 %left '+' '-'
 %left '*' '/'
 %right DIFFOP
 %left LESSOP LESSEQOP GREATEROP GREATEREQ EQOP OROP ANDOP NEQOP
 %start progr 
 %%
-progr: global func object_declar bloc_prog {printf("program corect sintactic\n");}
+progr: global func object_declar bloc_prog {printf("Program corect sintactic!\n");}
      ;
 
 /* GLOBAL VAR SECTION */
@@ -48,8 +68,20 @@ params : param
        | params ',' param
        ;
 
-param : ID ':' TIP 
-      | ID '[' NR ']' ':' TIP
+param : ID ':' TIP { 
+                        if (lookup_symbol_in_scope($1, 0) != NULL) {
+                            printf("Eroare la linia %d: variabila %s este declarata de mai multe ori\n", yylineno, $1); exit(1);
+                        } else {
+                            insert_symbol($1, 0, $3, 0, 0, 0, 0);
+                        }
+                    }
+      | ID '[' NR ']' ':' TIP { 
+                                  if (lookup_symbol_in_scope($1, 0) != NULL) {
+                                      printf("Eroare la linia %d: variabila %s este declarata de mai multe ori\n", yylineno, $1); exit(1);
+                                  } else {
+                                      insert_symbol($1, 0, $6, 0, 0, $3, 0);
+                                  }
+                              }
       ;
 
 /* FUNC SECTION */
@@ -63,15 +95,30 @@ func_declar : fun ';'
 fun : FUNCDEF body_func
     ;
 
-body_func : ID '(' func_params ')' RTRNARROW TIP body_instr
-          | ID '(' ')' RTRNARROW TIP body_instr
+body_func : ID '(' func_params ')' RTRNARROW TIP body_instr {   
+                                                                countpf = 0;
+                                                                if (lookup_symbol_in_scope($1, 0) != NULL) {
+                                                                    printf("Eroare la linia %d: variabila %s este declarata de mai multe ori\n", yylineno, $1); exit(1);
+                                                                } else {
+                                                                    insert_symbol($1, 2, $6, 0, 0, 0, countpf);
+                                                                }
+                                                            }
+          | ID '(' ')' RTRNARROW TIP body_instr {   
+                                                    if (lookup_symbol_in_scope($1, 0) != NULL) {
+                                                        printf("Eroare la linia %d: variabila %s este declarata de mai multe ori\n", yylineno, $1); exit(1);
+                                                    } else {
+                                                        insert_symbol($1, 2, $5, 0, 0, 0, 0);
+                                                    }
+                                                }
           ;
 
-func_params : func_param
-            | func_params ',' func_param 
+func_params : func_param    { countpf++; }
+            | func_params ',' func_param { countpf += 2; }
             ;
 
-func_param : ID ':' TIP
+func_param : ID ':' TIP {   
+                            //cam discutabil aici pentru ca mai multe functii pot avea aeiasi parametri
+                        }
            ;
 
 body_instr : body_if
