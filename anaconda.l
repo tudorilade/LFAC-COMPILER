@@ -66,6 +66,8 @@ void pprint(char *token_type);
         }
 [a-zA-Z]*\[[1-9][0-9]*|0\] {return ARRAY;}
 ":=" {return ASSIGN;}
+[1-9][0-9]*|0 { return INT; }
+[1-9][0-9]*\.[0-9]+|0*\.[0-9]+ { return FLOAT; }
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}

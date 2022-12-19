@@ -232,15 +232,15 @@ body_if : '{' instructions '}'
 assigments : var ASSIGN arg
            | ID '(' lista_apel ')'
            | ID RTRNARROW ID '(' lista_apel ')'
-           | DECLAR ID '[' NR ']' ':' TIP
-           | ID '[' NR ']'
+           | DECLAR ID '[' INT ']' ':' TIP
+           | ID '[' INT ']'
            ;
 
 var : ID
     | DECLAR ID ':' TIP
     | ID RTRNARROW ID
-    | ID '[' NR ']'
-    | DECLAR ID '[' NR ']' ':' TIP
+    | ID '[' INT ']'
+    | DECLAR ID '[' INT ']' ':' TIP
     ;
 
 lista_apel : arg
@@ -269,9 +269,11 @@ expr : '[' expr ']'
      | primitives
      ;
 
-primitives : NR
+primitives : INT
            | '"' ID '"'
-           | '"' NR '"'
+           | '"' INT '"'
+           | FLOAT
+           | '"' FLOAT '"'
            | ID
            | TRUEP
            | FALSEP
@@ -280,6 +282,7 @@ primitives : NR
            | ID RTRNARROW ID '(' ')'
            | ID '(' lista_apel ')'
            | ID '(' ')'
+           | ID '[' INT ']'
            ;
 
 %%
