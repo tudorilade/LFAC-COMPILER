@@ -16,7 +16,7 @@ extern int ylex();
 }
 
 %token ID 
-%token TIP BGIN END ASSIGN NR DECLAR
+%token TIP BGIN END ASSIGN INT FLOAT DECLAR
 %token GLOBAL ENDGLOBAL 
 %token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
 %token FUNC ENDFUNC RTRNARROW FUNCDEF 
@@ -49,7 +49,7 @@ params : param
        ;
 
 param : ID ':' TIP 
-      | ID '[' NR ']' ':' TIP
+      | ID '[' INT ']' ':' TIP
       ;
 
 /* FUNC SECTION */
@@ -179,16 +179,16 @@ body_if : '{' instructions '}'
 assigments : var ASSIGN arg
            | ID '(' lista_apel ')'
            | ID RTRNARROW ID '(' lista_apel ')'
-           | DECLAR ID '[' NR ']' ':' TIP
-           | ID '[' NR ']'
+           | DECLAR ID '[' INT ']' ':' TIP
+           | ID '[' INT ']'
            ;
 
 var : ID
     | ID '(' lista_apel ')' 
     | DECLAR ID ':' TIP
     | ID RTRNARROW ID
-    | ID '[' NR ']'
-    | DECLAR ID '[' NR ']' ':' TIP
+    | ID '[' INT ']'
+    | DECLAR ID '[' INT ']' ':' TIP
     ;
 
 lista_apel : arg
@@ -217,9 +217,11 @@ expr : '[' expr ']'
      | primitives
      ;
 
-primitives : NR
+primitives : INT
            | '"' ID '"'
-           | '"' NR '"'
+           | '"' INT '"'
+           | FLOAT
+           | '"' FLOAT '"'
            | ID
            | TRUEP
            | FALSEP

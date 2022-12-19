@@ -64,7 +64,8 @@ void yyerror(char *s);
                             return ID;
                         }
 ":=" {return ASSIGN;}
-[1-9][0-9]*|0 {return NR;}
+[1-9][0-9]*|0 { return INT; }
+[1-9][0-9]*\.[0-9]+|0*\.[0-9]+ { return FLOAT; }
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}

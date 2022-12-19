@@ -24,6 +24,7 @@ func1     	Function  	Global    	N\A       	N\A       	-1
 b         	Function  	Global    	N\A       	N\A       	-1        
 a         	Function  	Global    	N\A       	N\A       	-1        
 func      	Function  	Global    	N\A       	N\A       	-1        
+s         	Function  	Global    	N\A       	N\A       	-1        
 arr       	Function  	Global    	N\A       	N\A       	-1        
 tmp       	Function  	Global    	N\A       	N\A       	-1        
 i         	Function  	Global    	N\A       	N\A       	-1        
