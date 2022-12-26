@@ -6,6 +6,7 @@
 
 #define MAX_SYMBOLS 100
 #define MAXTOKENLEN 40
+#define MAXIDLEN 20
 extern char *yytext;
 int count = 0;
 int dataType;
@@ -18,13 +19,14 @@ int inDataType;
 
 struct symbol
 {
-    char name[MAXTOKENLEN]; // name of the variable
-    int dataType;           // 0 - variable, 1 - vector (array), 2 - function, 3 - structure, 4 - class
-    char type[10];          // int, char, float
-    int value;              // value of the variable, applicaple only for variables
-    int arraySize;          // size of the array, applicaple only for vectors
-    int numberOfParameters; // number of parameters, applicaple only for functions
-    struct symbol *next;    // pointer to the next symbol in the list
+    char name[MAXTOKENLEN];         // name of the variable
+    int dataType;                   // 0 - variable, 1 - vector (array), 2 - string/char, 3 - function, 4 - object
+    char type[MAXIDLEN];            // int, char, float
+    int value;                      // value of the variable, applicaple only for int/float variables
+    char valueString[MAXTOKENLEN];  // value of the variable, applicaple only for char/string variables
+    int arraySize;                  // size of the array, applicaple only for vectors
+    int numberOfParameters;         // number of parameters, applicaple only for functions
+    struct symbol *next;            // pointer to the next symbol in the list
 };
 
 struct symbol *sym_table = NULL;
@@ -40,7 +42,7 @@ void init_symbol_table()
     fclose(file);
 }
 
-void insert_symbol(char *name, int dataType, char *type, int value, int arraySize, int numberOfParameters)
+void insert_symbol(char *name, int dataType, char *type, int value, char* val, int arraySize, int numberOfParameters)
 {
     struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
 
@@ -65,6 +67,9 @@ void insert_symbol(char *name, int dataType, char *type, int value, int arraySiz
         s->arraySize = 0;
 
     if (dataType == 2)
+        strcpy(s->valueString, val);
+
+    if (dataType == 3)
         s->numberOfParameters = numberOfParameters;
     else
         s->numberOfParameters = 0;
@@ -101,6 +106,10 @@ void print_symbol_table(FILE *file)
         }
         else if (s->dataType == 2)
         {
+            fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "String", s->type, s->valueString, "N\\A", "N\\A");
+        }
+        else if (s->dataType == 3)
+        {
             fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10d\n", s->name, "Function", s->type, "N\\A", "N\\A", s->numberOfParameters);
 
             //write in symbol_table_functions.txt
@@ -108,13 +117,9 @@ void print_symbol_table(FILE *file)
             fprintf(file2, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10d\n", s->name, "Function", s->type, "N\\A", "N\\A", s->numberOfParameters);
             fclose(file2);
         }
-        else if (s->dataType == 3)
-        {
-            fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "Structure", s->type, "N\\A", "N\\A", "N\\A");
-        }
         else if (s->dataType == 4)
         {
-            fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "Class", s->type, "N\\A", "N\\A", "N\\A");
+            fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "Object", "N\\A", "N\\A", "N\\A", "N\\A");
         }
         else
         {

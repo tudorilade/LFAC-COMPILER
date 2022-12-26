@@ -143,14 +143,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 20 "anaconda.y"
+#line 34 "anaconda.y"
 
     int int_val;
     double float_val;
     char *bool_val;
     char char_val;
     char *str_val;
-    struct symbol_table *s;
+    struct symbol *s;
 
 #line 156 "y.tab.h"
 

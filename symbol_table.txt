@@ -1,5 +1,10 @@
 Name      	DataType  	Type      	Value      	ArraySize	NrOfParams
 ----------------------------------------------------------------------
+MyObj5    	Object    	N\A       	N\A       	N\A       	N\A       
+MyObj3    	Object    	N\A       	N\A       	N\A       	N\A       
+func2     	Function  	float     	N\A       	N\A       	2         
+MyObj2    	Object    	N\A       	N\A       	N\A       	N\A       
+MyObj1    	Object    	N\A       	N\A       	N\A       	N\A       
 func1     	Function  	int       	N\A       	N\A       	3         
 dsyd      	Variable  	float     	0         	N\A       	N\A       
 y         	Variable  	int       	0         	N\A       	N\A       

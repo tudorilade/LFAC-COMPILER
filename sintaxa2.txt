@@ -31,7 +31,7 @@ OBJECT
     ];
 
     impl func(c: int, d: int) -> int of MyObj3 {
-         c := d;
+         c := "dhtgne";
     };
 
     object MyObj6[

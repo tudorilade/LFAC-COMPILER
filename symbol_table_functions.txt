@@ -1,4 +1,2 @@
 Name      	DataType  	Type      	Value      	ArraySize	NrOfParams
 ----------------------------------------------------------------------
-func1     	Function  	int       	N\A       	N\A       	3         
-func      	Function  	int       	N\A       	N\A       	2         
