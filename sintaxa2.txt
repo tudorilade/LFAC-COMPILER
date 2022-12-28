@@ -1,6 +1,6 @@
 GLOBAL
     be t: char;
-    be c: int;
+    be strrr: string;
     be x: char, i: int;
     be tmp: int;
 END_GLOBAL
@@ -8,7 +8,7 @@ END_GLOBAL
 FUNC
     def func(a: int, b: int) -> int {};
     def func1(d: int, y: int, dsyd: float) -> int{
-        be y: MyObj4{};
+        be yObj: MyObj4{};
     };
 
 END_FUNC
@@ -31,7 +31,7 @@ OBJECT
     ];
 
     impl func(c: int, d: int) -> int of MyObj3 {
-         c := "dhtgne";
+         strrr := "iolo";
     };
 
     object MyObj6[
@@ -57,5 +57,8 @@ END_OBJECT
 BEGIN_PROGRAM
     c := y->d;
     be c: float := y->d;
+    strrr := "9";
+
+    t := 2;
 
 END_PROGRAM

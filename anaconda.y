@@ -10,8 +10,18 @@ extern int yylineno;
 extern char* yytext;
 extern int ylex();
 
-void insert_symbol(char *name, int dataType, char *type, int value, char* val, int arraySize, int numberOfParameters);
+void insertSymbolInt(char *name, int valueInt);
+void insertSymbolFloat(char *name, double valueFloat);
+void insertSymbolString(char *name, char *valueString);
+void insertSymbolBool(char *name, char *valueBool);
+void insertSymbolChar(char *name, char *valueChar);
+void insertSymbolArray(char *name, char *type, int arraySize);
+void insertSymbolFunction(char *name, char *type, int numberOfParameters);
+void insertSymbolObject(char *names);
+void updateSymbol(char *name, int valueInt, double valueFloat, char *valueString);
+
 struct symbol *lookup_symbol(char *name);
+void initSymbolTable();
 void print_symbol_table(FILE *file);
 
 void notDefinedErr(char *name);             //function that prints an error message when a variable is not defined
@@ -23,16 +33,12 @@ void notObjErr(char *name);                 //function that prints an error mess
 void typeErr(char *t1, char *t2);           //function that prints an error message when a variable has a different type
 
 int countpf;
-int const_num;
-double const_float;
-char const_char;
-char const_string[100];
-char const_bool[100];
+char const_type[100];
 struct symbol *sym;
 %}
 
 %union {
-    int int_val;
+    int int_val; 
     double float_val;
     char *bool_val;
     char char_val;
@@ -88,14 +94,24 @@ param : ID ':' TIP              {
                                     if (lookup_symbol($1) != NULL) {
                                         prevDefinedErr($1);
                                     } else {
-                                        insert_symbol($1, 0, $3, 0, "", 0, 0);
+                                        if (strcmp($3, "int") == 0) {
+                                            insertSymbolInt($1, 0);
+                                        } else if (strcmp($3, "float") == 0) {
+                                            insertSymbolFloat($1, 0.0);
+                                        } else if (strcmp($3, "char") == 0) {
+                                            insertSymbolChar($1, "");
+                                        } else if (strcmp($3, "string") == 0) {
+                                            insertSymbolString($1, "");
+                                        } else if (strcmp($3, "bool") == 0) {
+                                            insertSymbolBool($1, "");
+                                        }
                                     }
                                 }
       | ID '[' INT ']' ':' TIP  { 
                                     if (lookup_symbol($1) != NULL) {
                                         prevDefinedErr($1);
                                     } else {
-                                        insert_symbol($1, 1, $6, 0, "", $3, 0);
+                                        insertSymbolArray($1, $6, $3);
                                     }
                                 }
       ;
@@ -115,7 +131,7 @@ body_func : ID '(' func_params ')' RTRNARROW TIP body_instr {
                                                                 if (lookup_symbol($1) != NULL) {
                                                                     prevDefinedErr($1);
                                                                 } else {
-                                                                    insert_symbol($1, 3, $6, 0, "", 0, countpf);
+                                                                    insertSymbolFunction($1, $6, countpf);
                                                                 }
                                                                 countpf = 0;
                                                             }
@@ -123,7 +139,7 @@ body_func : ID '(' func_params ')' RTRNARROW TIP body_instr {
                                                                 if (lookup_symbol($1) != NULL) {
                                                                     prevDefinedErr($1);
                                                                 } else {
-                                                                    insert_symbol($1, 3, $5, 0, "", 0, 0);
+                                                                    insertSymbolFunction($1, $5, 0);
                                                                 }
                                                             }
           ;
@@ -136,7 +152,17 @@ func_param : ID ':' TIP                                     {
                                                                 if (lookup_symbol($1) != NULL) {
                                                                     prevDefinedErr($1);
                                                                 } else {
-                                                                    insert_symbol($1, 0, $3, 0, "", 0, 0);
+                                                                    if (strcmp($3, "int") == 0) {
+                                                                        insertSymbolInt($1, 0);
+                                                                    } else if (strcmp($3, "float") == 0) {
+                                                                        insertSymbolFloat($1, 0.0);
+                                                                    } else if (strcmp($3, "char") == 0) {
+                                                                        insertSymbolChar($1, "");
+                                                                    } else if (strcmp($3, "string") == 0) {
+                                                                        insertSymbolString($1, "");
+                                                                    } else if (strcmp($3, "bool") == 0) {
+                                                                        insertSymbolBool($1, "");
+                                                                    }
                                                                 }
                                                             }
            ;
@@ -161,29 +187,49 @@ object : DECLOBJECT ID '[' inside_obj ']'                   {
                                                                 if (lookup_symbol($2) != NULL) {
                                                                     prevDefinedErr($2);
                                                                 } else {
-                                                                    insert_symbol($2, 4, "", 0, "", 0, 0);
+                                                                    insertSymbolObject($2);
                                                                 }   
                                                             }
        | DECLOBJECT ID '[' ']'                              {
                                                                 if (lookup_symbol($2) != NULL) {
                                                                     prevDefinedErr($2);
                                                                 } else {
-                                                                    insert_symbol($2, 4, "", 0, "", 0, 0);
+                                                                    insertSymbolObject($2);
                                                                 }   
                                                             }
        | DECLOBJECT ID ':' INHERIT ID '[' inside_obj ']'    {
                                                                 if (lookup_symbol($2) != NULL) {
                                                                     prevDefinedErr($2);
                                                                 } else {
-                                                                    insert_symbol($2, 4, "", 0, "", 0, 0);
+                                                                    insertSymbolObject($2);
                                                                 }   
+
+                                                                if (lookup_symbol($5) == NULL) {
+                                                                    notDefinedErr($5);
+                                                                } else {
+                                                                    if (lookup_symbol($5)->dataType != 3) {
+                                                                        notObjErr($5);
+                                                                    } else {
+                                                                        insertSymbolObject($5);
+                                                                    }
+                                                                }
                                                             }
        | DECLOBJECT ID ':' INHERIT ID  '[' ']'              {
                                                                 if (lookup_symbol($2) != NULL) {
                                                                     prevDefinedErr($2);
                                                                 } else {
-                                                                    insert_symbol($2, 4, "", 0, 0, 0, 0);
+                                                                    insertSymbolObject($2);
                                                                 }   
+
+                                                                if (lookup_symbol($5) == NULL) {
+                                                                    notDefinedErr($5);
+                                                                } else {
+                                                                    if (lookup_symbol($5)->dataType != 3) {
+                                                                        notObjErr($5);
+                                                                    } else {
+                                                                        insertSymbolObject($5);
+                                                                    }
+                                                                }  
                                                             }
        ;
 
@@ -221,7 +267,7 @@ body_method : ID '(' func_params ')' RTRNARROW TIP          {
                                                                 if (lookup_symbol($1) != NULL) {
                                                                     prevDefinedErr($1);
                                                                 } else {
-                                                                    insert_symbol($1, 3, $6, 0, "", 0, countpf);
+                                                                    insertSymbolFunction($1, $6, countpf);
                                                                 }
                                                                 countpf = 0;
                                                             }
@@ -229,7 +275,7 @@ body_method : ID '(' func_params ')' RTRNARROW TIP          {
                                                                 if (lookup_symbol($1) != NULL) {
                                                                     prevDefinedErr($1);
                                                                 } else {
-                                                                    insert_symbol($1, 3, $5, 0, "", 0, 0);
+                                                                    insertSymbolFunction($1, $5, 0);
                                                                 }
                                                             }
             ;
@@ -250,8 +296,40 @@ some_objects : obj
              | some_objects ',' obj
              ;
 
-obj : ID ':' ID '{' lista_apel '}' 
-    | ID ':' ID '{' '}'
+obj : ID ':' ID '{' lista_apel '}'                          {
+                                                                if (lookup_symbol($1) == NULL) {
+                                                                    notDefinedErr($1);
+                                                                } else {
+                                                                    if (lookup_symbol($1)->dataType != 3) {
+                                                                        notObjErr($1);
+                                                                    }
+                                                                }
+
+                                                                if (lookup_symbol($3) == NULL) {
+                                                                    notDefinedErr($3);
+                                                                } else {
+                                                                    if (lookup_symbol($3)->dataType != 3) {
+                                                                        notObjErr($3);
+                                                                    }
+                                                                }
+                                                            }
+    | ID ':' ID '{' '}'                                     {
+                                                                if (lookup_symbol($1) == NULL) {
+                                                                    notDefinedErr($1);
+                                                                } else {
+                                                                    if (lookup_symbol($1)->dataType != 3) {
+                                                                        notObjErr($1);
+                                                                    }
+                                                                }
+
+                                                                if (lookup_symbol($3) == NULL) {
+                                                                    notDefinedErr($3);
+                                                                } else {
+                                                                    if (lookup_symbol($3)->dataType != 3) {
+                                                                        notObjErr($3);
+                                                                    }
+                                                                }
+                                                            }
     ;
       
 /* program main */
@@ -281,39 +359,123 @@ body_if : '{' instructions '}'
         ;
 
 assigments : var ASSIGN arg                         {
-                                                        sym = lookup_symbol($1);
+                                                        sym = lookup_symbol($1->name);
                                                         if (sym == NULL) {
-                                                            notDefinedErr($1);
+                                                            notDefinedErr($1->name);
                                                         } else {
-                                                            if (sym->type != $3->type) {
-                                                                typeErr(sym->name, $3->name);
-                                                            }
-                                                            else {
-                                                                if (sym->type == "int" || sym->type == "float") {
-                                                                    sym->value = $3->value;
+                                                            if (strcmp(sym->type, $3->type) == 0) {
+                                                                typeErr(sym->type, $3->type);
+                                                            } else {
+                                                                if (strcmp(sym->type, "int") == 0) {
+                                                                    sym->valueInt = $3->valueInt;
+                                                                } else if (strcmp(sym->type , "float") == 0) {
+                                                                    sym->valueFloat = $3->valueFloat;
                                                                 } else {
                                                                     strcpy(sym->valueString, $3->valueString);
                                                                 }
                                                             }
                                                         }
                                                     }
-           | ID '(' lista_apel ')'
-           | ID RTRNARROW ID '(' lista_apel ')'
-           | DECLAR ID '[' INT ']' ':' TIP
-           | ID '[' INT ']'
-           ;
+           | ID '(' lista_apel ')'                  {
+                                                        sym = lookup_symbol($1);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1);
+                                                        } else {
+                                                            if (sym->dataType != 2) {
+                                                                notFuncErr($1);
+                                                            }
+                                                        }
+                                                    }
+           | ID RTRNARROW ID '(' lista_apel ')'     {
+                                                        sym = lookup_symbol($1);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1);
+                                                        } else {
+                                                            if (sym->dataType != 3) {
+                                                                notObjErr($1);
+                                                            }
+                                                        }
 
-var : ID                                            { $$ = $1; }
+                                                        sym = lookup_symbol($3);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($3);
+                                                        } else {
+                                                            if (sym->dataType != 2) {
+                                                                notFuncErr($3);
+                                                            }
+                                                        }
+                                                    }
+           | DECLAR ID '[' INT ']' ':' TIP          {
+                                                        if (lookup_symbol($2) != NULL) { 
+                                                            prevDefinedErr($2);
+                                                        } else {
+                                                            insertSymbolArray($2, $7, $4);
+                                                        }
+                                                    }
+           | ID '[' INT ']'                         {
+                                                        sym = lookup_symbol($1);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1);
+                                                        } else {
+                                                            if (sym->dataType != 1) {
+                                                                notArrErr($1);
+                                                            }
+                                                        }
+                                                    }
+var : ID                                            { strcpy($$->name, $1); }
     | DECLAR ID ':' TIP                             {
                                                         if (lookup_symbol($2) != NULL) {
                                                             prevDefinedErr($2);
                                                         } else {
-                                                            insert_symbol($2, 1, $4, 0, "", 0, 0);
+                                                            if ($4 == "int") {
+                                                                insertSymbolInt($2, 0);
+                                                            } else if ($4 == "float") {
+                                                                insertSymbolFloat($2, 0.0);
+                                                            } else if ($4 == "char") {
+                                                                insertSymbolChar($2, "");
+                                                            } else if ($4 == "string") {
+                                                                insertSymbolString($2, "");
+                                                            } else if ($4 == "bool") {
+                                                                insertSymbolBool($2, "false");
+                                                            }
                                                         }
                                                     }
-    | ID RTRNARROW ID                               
-    | ID '[' INT ']'                               
-    | DECLAR ID '[' INT ']' ':' TIP
+    | ID RTRNARROW ID                               {
+                                                        sym = lookup_symbol($1);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1);
+                                                        } else {
+                                                            if (sym->dataType != 3) {
+                                                                notObjErr($1);
+                                                            }
+                                                        }
+
+                                                        sym = lookup_symbol($3);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($3);
+                                                        } else {
+                                                            if (sym->dataType != 3) {
+                                                                notObjErr($3);
+                                                            }
+                                                        }
+                                                    }                      
+    | ID '[' INT ']'                                {
+                                                        sym = lookup_symbol($1);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1);
+                                                        } else {
+                                                            if (sym->dataType != 1) {
+                                                                notArrErr($1);
+                                                            }
+                                                        }
+                                                    }      
+    | DECLAR ID '[' INT ']' ':' TIP                 {
+                                                        if (lookup_symbol($2) != NULL) {
+                                                            prevDefinedErr($2);
+                                                        } else {
+                                                            insertSymbolArray($2, $7, $4);
+                                                        }
+                                                    }
     ;
 
 lista_apel : arg
@@ -326,162 +488,148 @@ arg : '{' lista_apel '}'
 
 expr : '[' expr ']' 
      | expr '+' expr                                {
-                                                        if (lookup_symbol($1) != NULL) {
-                                                            if (lookup_symbol($1)->type != "int") {
-                                                                notIntErr($1);
+                                                        if (lookup_symbol($1->name) != NULL) {
+                                                            if (lookup_symbol($1->name)->type != "int") {
+                                                                notIntErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($3)->type != "int") {
-                                                                notIntErr($3);
+                                                        if (lookup_symbol($3->name) != NULL) {
+                                                            if (lookup_symbol($3->name)->type != "int") {
+                                                                notIntErr($3->name);
                                                             }
                                                         }   
                                                     }
      | expr '-' expr                                {
-                                                        if (lookup_symbol($1) != NULL) {
-                                                            if (lookup_symbol($1)->type != "int") {
-                                                                notIntErr($1);
+                                                        if (lookup_symbol($1->name) != NULL) {
+                                                            if (lookup_symbol($1->name)->type != "int") {
+                                                                notIntErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($3)->type != "int") {
-                                                                notIntErr($3);
+                                                        if (lookup_symbol($3->name) != NULL) {
+                                                            if (lookup_symbol($3->name)->type != "int") {
+                                                                notIntErr($3->name);
                                                             }
                                                         }   
                                                     }
      | expr '*' expr                                {
-                                                        if (lookup_symbol($1) != NULL) {
-                                                            if (lookup_symbol($1)->type != "int") {
-                                                                notIntErr($1);
+                                                        if (lookup_symbol($1->name) != NULL) {
+                                                            if (lookup_symbol($1->name)->type != "int") {
+                                                                notIntErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($3)->type != "int") {
-                                                                notIntErr($3);
+                                                        if (lookup_symbol($3->name) != NULL) {
+                                                            if (lookup_symbol($3->name)->type != "int") {
+                                                                notIntErr($3->name);
                                                             }
                                                         }   
                                                     }   
      | expr '/' expr                                {
-                                                        if (lookup_symbol($1) != NULL) {
-                                                            if (lookup_symbol($1)->type != "int") {
-                                                                notIntErr($1);
+                                                        if (lookup_symbol($1->name) != NULL) {
+                                                            if (lookup_symbol($1->name)->type != "int") {
+                                                                notIntErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($3)->type != "int") {
-                                                                notIntErr($3);
+                                                        if (lookup_symbol($3->name) != NULL) {
+                                                            if (lookup_symbol($3->name)->type != "int") {
+                                                                notIntErr($3->name);
                                                             }
                                                         }   
                                                     }
      | DIFFOP expr                                  
      | expr LESSEQOP expr                           {
-                                                        if (lookup_symbol($1) != NULL) {
-                                                            if (lookup_symbol($1)->type != "int") {
-                                                                notIntErr($1);
+                                                        if (lookup_symbol($1->name) != NULL) {
+                                                            if (lookup_symbol($1->name)->type != "int") {
+                                                                notIntErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($3)->type != "int") {
-                                                                notIntErr($3);
+                                                        if (lookup_symbol($3->name) != NULL) {
+                                                            if (lookup_symbol($3->name)->type != "int") {
+                                                                notIntErr($3->name);
                                                             }
                                                         }   
                                                     }
      | expr GREATEREQ expr                          {
-                                                        if (lookup_symbol($1) != NULL) {
-                                                            if (lookup_symbol($1)->type != "int") {
-                                                                notIntErr($1);
+                                                        if (lookup_symbol($1->name) != NULL) {
+                                                            if (lookup_symbol($1->name)->type != "int") {
+                                                                notIntErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($3)->type != "int") {
-                                                                notIntErr($3);
+                                                        if (lookup_symbol($3->name) != NULL) {
+                                                            if (lookup_symbol($3->name)->type != "int") {
+                                                                notIntErr($3->name);
                                                             }
-                                                        }   
+                                                        }  
                                                     }
      | expr LESSOP expr                             {
-                                                        if (lookup_symbol($1) != NULL) {
-                                                            if (lookup_symbol($1)->type != "int") {
-                                                                notIntErr($1);
+                                                        if (lookup_symbol($1->name) != NULL) {
+                                                            if (lookup_symbol($1->name)->type != "int") {
+                                                                notIntErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($3)->type != "int") {
-                                                                notIntErr($3);
+                                                        if (lookup_symbol($3->name) != NULL) {
+                                                            if (lookup_symbol($3->name)->type != "int") {
+                                                                notIntErr($3->name);
                                                             }
-                                                        }   
+                                                        }  
                                                     }
      | expr GREATEROP expr                          {
-                                                        if (lookup_symbol($1) != NULL) {
-                                                            if (lookup_symbol($1)->type != "int") {
-                                                                notIntErr($1);
+                                                        if (lookup_symbol($1->name) != NULL) {
+                                                            if (lookup_symbol($1->name)->type != "int") {
+                                                                notIntErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($3)->type != "int") {
-                                                                notIntErr($3);
+                                                        if (lookup_symbol($3->name) != NULL) {
+                                                            if (lookup_symbol($3->name)->type != "int") {
+                                                                notIntErr($3->name);
                                                             }
                                                         }   
                                                     }
      | expr ANDOP expr                              {
-                                                        if (lookup_symbol($1) != NULL && lookup_symbol($3) != NULL) {
-                                                            if (lookup_symbol($1)->value && lookup_symbol($3)->value) {
-                                                               // notBoolErr($1);
-                                                            }
-                                                        }   
+                                                          
                                                     }
      | expr OROP expr                               {
-                                                        if (lookup_symbol($1) != NULL && lookup_symbol($3) != NULL) {
-                                                            if (!(lookup_symbol($1)->value || lookup_symbol($3)->value)) {
-                                                               // notBoolErr($1);
-                                                            }
-                                                        }   
+                                                          
                                                     }
-     | expr NEQOP expr
+     | expr NEQOP expr                              
      | expr EQOP expr
      | '-' expr
      | primitives
      ;
 
 primitives : INT                                    { 
-                                                        $$ = $1; 
-                                                        strcpy($$->type, "int");
-                                                    }           
-           | '"' CHAR '"'                           { 
-                                                        strcpy($$->valueString, $2);
-                                                        strcpy($$->type, "char");
+                                                        updateSymbol($$->name, $1, 0.0, "");
                                                     }
-           | '"' STRING '"'                         {
-                                                        strcpy($$->valueString, $2);
-                                                        strcpy($$->type, "string");
+           | CHAR                                   { 
+                                                        strcpy($$->valueString, (char*)$1);
+                                                        sprintf($$->type, "char");
                                                     }
-           | '"' INT '"'                            {
-                                                        char *aux;
-                                                        sprintf(aux, "%d", $2);
-                                                        strcpy($$->valueString, aux);
-                                                        strcpy($$->type, "string");
+           | STRING                                 {
+                                                        strcpy($$->valueString, $1);
                                                     }
            | FLOAT                                  { 
-                                                        char *aux;
-                                                        sprintf(aux, "%f", $1);
-                                                        strcpy($$->valueString, aux);
-                                                    }
-           | '"' FLOAT '"'                          {
-                                                        char *aux;
-                                                        sprintf(aux, "%f", $2);
-                                                        strcpy($$->valueString, aux);
-                                                        strcpy($$->type, "string");
-                                                    }
+                                                        $$->valueFloat = $1;
+                                                        strcpy($$->type, "float");
+                                                    }                  
            | ID                                     {
                                                         sym = lookup_symbol($1);
                                                         if (sym == NULL) {
                                                             notDefinedErr($1);
                                                         } else {
-                                                                $$ = $1;
-                                                                strcpy($$->type, sym->type);
+                                                                strcpy($$->name, $1);
+                                                                
+                                                                if (sym->type == "int") {
+                                                                    $$->valueInt = sym->valueInt;
+                                                                } else if (sym->type == "float") {
+                                                                    $$->valueFloat = sym->valueFloat;
+                                                                } else if (sym->type == "char") {
+                                                                    strcpy($$->valueString, sym->valueString);
+                                                                } else if (sym->type == "string") {
+                                                                    strcpy($$->valueString, sym->valueString);
+                                                                }
                                                         }
                                                     }
-           | TRUEP                                  { $$ = $1; }          
-           | FALSEP                                 { $$ = $1; }
+           | TRUEP                                  { strcpy($$->valueString, $1); }          
+           | FALSEP                                 { strcpy($$->valueString, $1); }
            | ID RTRNARROW ID                        {
                                                         sym = lookup_symbol($1);
                                                         if (sym == NULL) {
@@ -614,7 +762,7 @@ void typeErr(char *t1, char *t2)
 
 int main(int argc, char *argv[])
 {
-    init_symbol_table();
+    initSymbolTable();
 
     if (argc)
     {

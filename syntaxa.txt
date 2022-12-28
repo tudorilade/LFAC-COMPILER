@@ -12,7 +12,7 @@ FUNC
     def func(a: int, b: int) -> int {};
     def func1(d: int, y: int) -> int{
         be y: MyObj4{};
-        c := 4;
+        c := "yo";
     };
     def func3() -> string{
         t := "u";

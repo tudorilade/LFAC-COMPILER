@@ -143,9 +143,9 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 34 "anaconda.y"
+#line 40 "anaconda.y"
 
-    int int_val;
+    int int_val; 
     double float_val;
     char *bool_val;
     char char_val;

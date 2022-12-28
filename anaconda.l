@@ -75,8 +75,9 @@ void pprint(char *token_type);
                                         }
 
 \".\"                                   { 
-                                            yylval.char_val = yytext[0]; 
-                                            return CHAR; 
+                                            yylval.str_val = (char*)malloc(strlen(yytext) + 1); 
+                                            strcpy(yylval.str_val, yytext); 
+                                            return STRING; 
                                         }
 
 \".*\"                                  { 
