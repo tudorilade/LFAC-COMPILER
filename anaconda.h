@@ -223,6 +223,15 @@ void insertSymbolObject(char *name)
     s->next = sym_table;
     sym_table = s;
 }
+  
+struct symbol *lookup_symbol(char *name)
+{
+    struct symbol *s;
+    for (s = sym_table; s != NULL; s = s->next)
+        if (strcmp(s->name, name) == 0)
+            return s;
+    return NULL;
+}
 
 void updateSymbol(char *name, int valueInt, double valueFloat, char *valueString)
 {
@@ -237,16 +246,7 @@ void updateSymbol(char *name, int valueInt, double valueFloat, char *valueString
     s->valueInt = valueInt;
     s->valueFloat = valueFloat;
     strcpy(s->valueString, valueString);
-}   
-
-struct symbol *lookup_symbol(char *name)
-{
-    struct symbol *s;
-    for (s = sym_table; s != NULL; s = s->next)
-        if (strcmp(s->name, name) == 0)
-            return s;
-    return NULL;
-}
+} 
 
 void print_symbol_table(FILE *file)
 {
