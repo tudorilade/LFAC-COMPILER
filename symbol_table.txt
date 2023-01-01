@@ -18,8 +18,11 @@ d         	Variable  	int       	0         	N\A       	N\A
 func      	Function  	int       	N\A       	N\A       	2         
 b         	Variable  	int       	0         	N\A       	N\A       
 a         	Variable  	int       	0         	N\A       	N\A       
-tmp       	Variable  	int       	0         	N\A       	N\A       
-i         	Variable  	int       	0         	N\A       	N\A       
-x         	Variable  	char      	          	N\A       	N\A       
-strrr     	Variable  	string    	"9"       	N\A       	N\A       
-t         	Variable  	char      	          	N\A       	N\A       
+gfjsgh    	Variable  	int       	0         	N\A       	N\A       
+tmp       	Variable  	int       	12678     	N\A       	N\A       
+arr2      	Vector    	int       	N\A       	10        	N\A       
+arr       	Vector    	int       	N\A       	5         	N\A       
+i         	Variable  	float     	0.987000  	N\A       	N\A       
+x         	Variable  	char      	"3"       	N\A       	N\A       
+strrr     	Variable  	string    	"iolo"    	N\A       	N\A       
+t         	Variable  	string    	"uuuuu9"  	N\A       	N\A       

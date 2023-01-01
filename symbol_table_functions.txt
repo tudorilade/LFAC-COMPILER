@@ -1,2 +1,6 @@
 Name      	DataType  	Type      	Value      	ArraySize	NrOfParams
 ----------------------------------------------------------------------
+func6     	Function  	string    	N\A       	N\A       	0         
+func2     	Function  	float     	N\A       	N\A       	2         
+func1     	Function  	int       	N\A       	N\A       	3         
+func      	Function  	int       	N\A       	N\A       	2         

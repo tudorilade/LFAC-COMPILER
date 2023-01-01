@@ -1,8 +1,11 @@
 GLOBAL
-    be t: char;
+    be t: string;
     be strrr: string;
-    be x: char, i: int;
+    be x: char, i: float;
+    be arr[5]: int;
+    be arr2[10]: int;
     be tmp: int;
+    be gfjsgh: int;
 END_GLOBAL
 
 FUNC
@@ -57,8 +60,9 @@ END_OBJECT
 BEGIN_PROGRAM
     c := y->d;
     be c: float := y->d;
-    strrr := "9";
-
-    t := 2;
+    t := "uuuuu9";
+    i := 0.987;
+    tmp := 12678;
+    x := "3";
 
 END_PROGRAM

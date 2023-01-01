@@ -233,19 +233,17 @@ struct symbol *lookup_symbol(char *name)
     return NULL;
 }
 
-void updateSymbol(char *name, int valueInt, double valueFloat, char *valueString)
+struct symbol *updateSymbol(char *name, int valueInt, double valueFloat, char *valueString)
 {
     struct symbol *s = lookup_symbol(name);
-
-    if (s == NULL)
-    {
-        printf("Symbol not found!");
-        exit(1);
-    }
-
+    strcpy(s->name, name);
     s->valueInt = valueInt;
     s->valueFloat = valueFloat;
     strcpy(s->valueString, valueString);
+
+    //printf("values: %d, %f, %s of symbol %s\n", s->valueInt, s->valueFloat, s->valueString, s->name);
+
+    return s;
 } 
 
 void print_symbol_table(FILE *file)

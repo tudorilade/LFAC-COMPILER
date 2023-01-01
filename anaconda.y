@@ -8,7 +8,8 @@ extern FILE* yyin;
 extern FILE* yyout;
 extern int yylineno;
 extern char* yytext;
-extern int ylex();
+extern int yylex();
+extern int yyerror();
 
 void insertSymbolInt(char *name, int valueInt);
 void insertSymbolFloat(char *name, double valueFloat);
@@ -18,7 +19,7 @@ void insertSymbolChar(char *name, char *valueChar);
 void insertSymbolArray(char *name, char *type, int arraySize);
 void insertSymbolFunction(char *name, char *type, int numberOfParameters);
 void insertSymbolObject(char *names);
-void updateSymbol(char *name, int valueInt, double valueFloat, char *valueString);
+struct symbol *updateSymbol(char *name, int valueInt, double valueFloat, char *valueString);
 
 struct symbol *lookup_symbol(char *name);
 void initSymbolTable();
@@ -376,6 +377,45 @@ assigments : var ASSIGN arg                         {
                                                             }
                                                         }
                                                     }
+           | var ASSIGN INT               {
+                                                        sym = lookup_symbol($1->name);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym->type[0] != 'i') {
+                                                                typeErr(sym->type, "int");
+                                                            } else {
+                                                                $1 = updateSymbol($1->name, $3, 0.0, "");
+                                                                //printf("value: %d at line %d\n", $3, yylineno);
+                                                            }
+                                                        }
+                                                    }
+           | var ASSIGN FLOAT             {
+                                                          sym = lookup_symbol($1->name);
+                                                          if (sym == NULL) {
+                                                                notDefinedErr($1->name);
+                                                          } else {
+                                                                if (sym->type[0] != 'f') {
+                                                                 typeErr(sym->type, "float");
+                                                                } else {
+                                                                    $1 = updateSymbol($1->name, 0, $3, "");
+                                                                    //printf("value: %f at line %d\n", $3, yylineno);
+                                                                }
+                                                          }
+                                                    }
+           | var ASSIGN STRING                      {
+                                                          sym = lookup_symbol($1->name);
+                                                          if (sym == NULL) {
+                                                                notDefinedErr($1->name);
+                                                          } else {
+                                                                if (sym->type[0] != 's' && sym->type[0] != 'c') {
+                                                                 typeErr(sym->type, "string");
+                                                                } else {
+                                                                    $1 = updateSymbol($1->name, 0, 0.0, $3);
+                                                                    //printf("value: %s at line %d\n", $3, yylineno);
+                                                                }
+                                                          }
+                                                    }
            | ID '(' lista_apel ')'                  {
                                                         sym = lookup_symbol($1);
                                                         if (sym == NULL) {
@@ -480,14 +520,14 @@ var : ID                                            { strcpy($$->name, $1); }
 
 lista_apel : arg
            | lista_apel ',' arg
+           | '{' lista_apel '}'
            ;
 
-arg : '{' lista_apel '}'
-    | expr
+arg : expr
+    | '[' expr ']'
     ;
 
-expr : '[' expr ']' 
-     | expr '+' expr                                {
+expr : expr '+' expr                                {
                                                         if (lookup_symbol($1->name) != NULL) {
                                                             if (lookup_symbol($1->name)->type != "int") {
                                                                 notIntErr($1->name);
@@ -535,7 +575,6 @@ expr : '[' expr ']'
                                                             }
                                                         }   
                                                     }
-     | DIFFOP expr                                  
      | expr LESSEQOP expr                           {
                                                         if (lookup_symbol($1->name) != NULL) {
                                                             if (lookup_symbol($1->name)->type != "int") {
@@ -592,45 +631,12 @@ expr : '[' expr ']'
                                                     }
      | expr NEQOP expr                              
      | expr EQOP expr
+     | DIFFOP expr                                  
      | '-' expr
      | primitives
      ;
 
-primitives : INT                                    { 
-                                                        updateSymbol($$->name, $1, 0.0, "");
-                                                    }
-           | CHAR                                   { 
-                                                        strcpy($$->valueString, (char*)$1);
-                                                        sprintf($$->type, "char");
-                                                    }
-           | STRING                                 {
-                                                        strcpy($$->valueString, $1);
-                                                    }
-           | FLOAT                                  { 
-                                                        $$->valueFloat = $1;
-                                                        strcpy($$->type, "float");
-                                                    }                  
-           | ID                                     {
-                                                        sym = lookup_symbol($1);
-                                                        if (sym == NULL) {
-                                                            notDefinedErr($1);
-                                                        } else {
-                                                                strcpy($$->name, $1);
-                                                                
-                                                                if (sym->type == "int") {
-                                                                    $$->valueInt = sym->valueInt;
-                                                                } else if (sym->type == "float") {
-                                                                    $$->valueFloat = sym->valueFloat;
-                                                                } else if (sym->type == "char") {
-                                                                    strcpy($$->valueString, sym->valueString);
-                                                                } else if (sym->type == "string") {
-                                                                    strcpy($$->valueString, sym->valueString);
-                                                                }
-                                                        }
-                                                    }
-           | TRUEP                                  { strcpy($$->valueString, $1); }          
-           | FALSEP                                 { strcpy($$->valueString, $1); }
-           | ID RTRNARROW ID                        {
+primitives : ID RTRNARROW ID                        {
                                                         sym = lookup_symbol($1);
                                                         if (sym == NULL) {
                                                             notDefinedErr($1);
@@ -716,7 +722,25 @@ primitives : INT                                    {
                                                             }
                                                         }
                                                     }
-           ;
+           | ID                                     {
+                                                        sym = lookup_symbol($1);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1);
+                                                        } else {
+                                                                strcpy($$->name, $1);
+                                                                
+                                                                if (sym->type == "int") {
+                                                                    $$->valueInt = sym->valueInt;
+                                                                } else if (sym->type == "float") {
+                                                                    $$->valueFloat = sym->valueFloat;
+                                                                } else if (sym->type == "char") {
+                                                                    strcpy($$->valueString, sym->valueString);
+                                                                } else if (sym->type == "string") {
+                                                                    strcpy($$->valueString, sym->valueString);
+                                                                }
+                                                        }
+                                                    }
+            ;
 
 %%
 
