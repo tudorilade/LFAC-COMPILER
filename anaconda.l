@@ -70,12 +70,12 @@ void pprint(char *token_type);
                                             return STRING; 
                                         }
 
-[1-9][0-9]*|0                           { 
+(-)?[1-9][0-9]*|0                       { 
                                             yylval.int_val = atoi(yytext); 
                                             return INT; 
                                         }
 
-[1-9][0-9]*\.[0-9]+|0*\.[0-9]+          { 
+(-)?[1-9][0-9]*\.[0-9]+|(-)?0*\.[0-9]+      { 
                                             yylval.float_val = atof(yytext); 
                                             return FLOAT; 
                                         }

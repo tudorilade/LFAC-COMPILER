@@ -25,13 +25,15 @@ struct symbol *lookup_symbol(char *name);
 void initSymbolTable();
 void print_symbol_table(FILE *file);
 
-void notDefinedErr(char *name);             //function that prints an error message when a variable is not defined
-void prevDefinedErr(char *name);            //function that prints an error message when a variable is already defined
-void notIntErr(char *name);                 //function that prints an error message when a variable is not an integer
-void notArrErr(char *name);                 //function that prints an error message when a variable is not an array
-void notFuncErr(char *name);                //function that prints an error message when a variable is not a function
-void notObjErr(char *name);                 //function that prints an error message when a variable is not an object
-void typeErr(char *t1, char *t2);           //function that prints an error message when a variable has a different type
+void notDefinedErr(char *name);             //function that prints an error message when a symbol is not defined
+void prevDefinedErr(char *name);            //function that prints an error message when a symbol is already defined
+void notVarErr(char *name);                 //function that prints an error message when a symbol is not a variable
+void notIntErr(char *name);                 //function that prints an error message when a symbol is not an integer
+void notArrErr(char *name);                 //function that prints an error message when a symbol is not an array
+void notFuncErr(char *name);                //function that prints an error message when a symbol is not a function
+void notObjErr(char *name);                 //function that prints an error message when a symbol is not an object
+void typeErr(char *t1, char *t2);           //function that prints an error message when a symbol has a different type
+void divByZeroErr();                        //function that prints an error message when a division by zero is attempted
 
 int countpf;
 char const_type[100];
@@ -128,7 +130,7 @@ func_declar : fun ';'
 fun : FUNCDEF body_func
     ;
 
-body_func : ID '(' func_params ')' RTRNARROW TIP body_instr {
+body_func : ID '(' func_params ')' RTRNARROW TIP body_instr {   
                                                                 if (lookup_symbol($1) != NULL) {
                                                                     prevDefinedErr($1);
                                                                 } else {
@@ -149,10 +151,8 @@ func_params : func_param                                    { countpf++; }
             | func_params ',' func_param                    { countpf++; }
             ;
 
-func_param : ID ':' TIP                                     {   
+func_param : ID ':' TIP                                     {   // daca exista simbolul in tabel, ii putem face atribuiri, nu e o DECLAR deci nu ne intereseaza sa zicem ca a fost deja definit
                                                                 if (lookup_symbol($1) != NULL) {
-                                                                    prevDefinedErr($1);
-                                                                } else {
                                                                     if (strcmp($3, "int") == 0) {
                                                                         insertSymbolInt($1, 0);
                                                                     } else if (strcmp($3, "float") == 0) {
@@ -359,25 +359,7 @@ clauses : IFCLAUSE expr body_if
 body_if : '{' instructions '}'
         ;
 
-assigments : var ASSIGN arg                         {
-                                                        sym = lookup_symbol($1->name);
-                                                        if (sym == NULL) {
-                                                            notDefinedErr($1->name);
-                                                        } else {
-                                                            if (strcmp(sym->type, $3->type) == 0) {
-                                                                typeErr(sym->type, $3->type);
-                                                            } else {
-                                                                if (strcmp(sym->type, "int") == 0) {
-                                                                    sym->valueInt = $3->valueInt;
-                                                                } else if (strcmp(sym->type , "float") == 0) {
-                                                                    sym->valueFloat = $3->valueFloat;
-                                                                } else {
-                                                                    strcpy(sym->valueString, $3->valueString);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-           | var ASSIGN INT               {
+assigments : var ASSIGN INT                         {
                                                         sym = lookup_symbol($1->name);
                                                         if (sym == NULL) {
                                                             notDefinedErr($1->name);
@@ -390,7 +372,7 @@ assigments : var ASSIGN arg                         {
                                                             }
                                                         }
                                                     }
-           | var ASSIGN FLOAT             {
+           | var ASSIGN FLOAT                       {
                                                           sym = lookup_symbol($1->name);
                                                           if (sym == NULL) {
                                                                 notDefinedErr($1->name);
@@ -408,14 +390,33 @@ assigments : var ASSIGN arg                         {
                                                           if (sym == NULL) {
                                                                 notDefinedErr($1->name);
                                                           } else {
-                                                                if (sym->type[0] != 's' && sym->type[0] != 'c') {
+                                                                if (sym->type[0] != 's' && sym->type[0] != 'c' && sym->type[0] != 'b') {
                                                                  typeErr(sym->type, "string");
                                                                 } else {
                                                                     $1 = updateSymbol($1->name, 0, 0.0, $3);
-                                                                    //printf("value: %s at line %d\n", $3, yylineno);
+                                                                    //printf("value: %s at line %d\n", $1->name, yylineno);
                                                                 }
                                                           }
                                                     }
+           | var ASSIGN arg                         {
+                                                        sym = lookup_symbol($1->name);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (strcmp(sym->type, $3->type) == 0) {
+                                                                typeErr(sym->type, $3->type);
+                                                            } else {
+                                                                if (strcmp(sym->type, "int") == 0) {
+                                                                    sym->valueInt = $3->valueInt;
+                                                                } else if (strcmp(sym->type , "float") == 0) {
+                                                                    sym->valueFloat = $3->valueFloat;
+                                                                } else {
+                                                                    strcpy(sym->valueString, $3->valueString);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+           
            | ID '(' lista_apel ')'                  {
                                                         sym = lookup_symbol($1);
                                                         if (sym == NULL) {
@@ -462,21 +463,35 @@ assigments : var ASSIGN arg                         {
                                                             }
                                                         }
                                                     }
-var : ID                                            { strcpy($$->name, $1); }
+var : ID                                            { 
+                                                        sym = lookup_symbol($1);
+                                                        if (sym == NULL) {
+                                                            notDefinedErr($1);
+                                                        } else {
+                                                            if (sym->dataType == 1) {
+                                                                notVarErr($1);
+                                                            } else {
+                                                                $$->valueInt = sym->valueInt;
+                                                                $$->valueFloat = sym->valueFloat;
+                                                                strcpy($$->valueString, sym->valueString);
+                                                                strcpy($$->type, sym->type);
+                                                            }
+                                                        }
+                                                    }
     | DECLAR ID ':' TIP                             {
                                                         if (lookup_symbol($2) != NULL) {
                                                             prevDefinedErr($2);
                                                         } else {
-                                                            if ($4 == "int") {
+                                                            if (strcmp($4, "int") == 0) {
                                                                 insertSymbolInt($2, 0);
-                                                            } else if ($4 == "float") {
+                                                            } else if (strcmp($4, "float") == 0) {
                                                                 insertSymbolFloat($2, 0.0);
-                                                            } else if ($4 == "char") {
+                                                            } else if (strcmp($4, "char") == 0) {
                                                                 insertSymbolChar($2, "");
-                                                            } else if ($4 == "string") {
+                                                            } else if (strcmp($4, "string") == 0) {
                                                                 insertSymbolString($2, "");
-                                                            } else if ($4 == "bool") {
-                                                                insertSymbolBool($2, "false");
+                                                            } else if (strcmp($4, "bool") == 0) {
+                                                                insertSymbolBool($2, "");
                                                             }
                                                         }
                                                     }
@@ -527,110 +542,346 @@ arg : expr
     | '[' expr ']'
     ;
 
-expr : expr '+' expr                                {
-                                                        if (lookup_symbol($1->name) != NULL) {
-                                                            if (lookup_symbol($1->name)->type != "int") {
-                                                                notIntErr($1->name);
+expr : expr '+' expr                                {   
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3->name) != NULL) {
-                                                            if (lookup_symbol($3->name)->type != "int") {
-                                                                notIntErr($3->name);
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "int") == 0) {
+                                                                $$->valueInt = sym1->valueInt + sym2->valueInt;
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                $$->valueFloat = sym1->valueFloat + sym2->valueFloat;
+                                                            } else if (strcmp(sym1->type, "string") == 0) {
+                                                                strcpy($$->valueString, sym1->valueString);
+                                                                strcat($$->valueString, sym2->valueString);
                                                             }
-                                                        }   
+                                                        }
                                                     }
      | expr '-' expr                                {
-                                                        if (lookup_symbol($1->name) != NULL) {
-                                                            if (lookup_symbol($1->name)->type != "int") {
-                                                                notIntErr($1->name);
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3->name) != NULL) {
-                                                            if (lookup_symbol($3->name)->type != "int") {
-                                                                notIntErr($3->name);
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "int") == 0) {
+                                                                $$->valueInt = sym1->valueInt - sym2->valueInt;
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                $$->valueFloat = sym1->valueFloat - sym2->valueFloat;
                                                             }
-                                                        }   
+                                                        }  
                                                     }
      | expr '*' expr                                {
-                                                        if (lookup_symbol($1->name) != NULL) {
-                                                            if (lookup_symbol($1->name)->type != "int") {
-                                                                notIntErr($1->name);
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3->name) != NULL) {
-                                                            if (lookup_symbol($3->name)->type != "int") {
-                                                                notIntErr($3->name);
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "int") == 0) {
+                                                                $$->valueInt = sym1->valueInt * sym2->valueInt;
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                $$->valueFloat = sym1->valueFloat * sym2->valueFloat;
                                                             }
-                                                        }   
+                                                        }     
                                                     }   
      | expr '/' expr                                {
-                                                        if (lookup_symbol($1->name) != NULL) {
-                                                            if (lookup_symbol($1->name)->type != "int") {
-                                                                notIntErr($1->name);
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3->name) != NULL) {
-                                                            if (lookup_symbol($3->name)->type != "int") {
-                                                                notIntErr($3->name);
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "int") == 0) {
+                                                                if (sym2->valueInt == 0) {
+                                                                    divByZeroErr();
+                                                                } else {
+                                                                    $$->valueInt = sym1->valueInt / sym2->valueInt;
+                                                                }
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                if (sym2->valueFloat == 0) {
+                                                                    divByZeroErr();
+                                                                } else {
+                                                                    $$->valueFloat = sym1->valueFloat / sym2->valueFloat;
+                                                                }
                                                             }
-                                                        }   
+                                                        }       
                                                     }
      | expr LESSEQOP expr                           {
-                                                        if (lookup_symbol($1->name) != NULL) {
-                                                            if (lookup_symbol($1->name)->type != "int") {
-                                                                notIntErr($1->name);
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                               
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3->name) != NULL) {
-                                                            if (lookup_symbol($3->name)->type != "int") {
-                                                                notIntErr($3->name);
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "int") == 0) {
+                                                                if (sym1->valueInt <= sym2->valueInt)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                if (sym1->valueFloat <= sym2->valueFloat)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
                                                             }
-                                                        }   
+                                                        }  
                                                     }
      | expr GREATEREQ expr                          {
-                                                        if (lookup_symbol($1->name) != NULL) {
-                                                            if (lookup_symbol($1->name)->type != "int") {
-                                                                notIntErr($1->name);
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3->name) != NULL) {
-                                                            if (lookup_symbol($3->name)->type != "int") {
-                                                                notIntErr($3->name);
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "int") == 0) {
+                                                                if (sym1->valueInt >= sym2->valueInt)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                if (sym1->valueFloat >= sym2->valueFloat)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
                                                             }
-                                                        }  
+                                                        }    
                                                     }
      | expr LESSOP expr                             {
-                                                        if (lookup_symbol($1->name) != NULL) {
-                                                            if (lookup_symbol($1->name)->type != "int") {
-                                                                notIntErr($1->name);
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3->name) != NULL) {
-                                                            if (lookup_symbol($3->name)->type != "int") {
-                                                                notIntErr($3->name);
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "int") == 0) {
+                                                                if (sym1->valueInt < sym2->valueInt)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                if (sym1->valueFloat < sym2->valueFloat)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
                                                             }
-                                                        }  
+                                                        } 
                                                     }
      | expr GREATEROP expr                          {
-                                                        if (lookup_symbol($1->name) != NULL) {
-                                                            if (lookup_symbol($1->name)->type != "int") {
-                                                                notIntErr($1->name);
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
                                                             }
                                                         }
-                                                        if (lookup_symbol($3->name) != NULL) {
-                                                            if (lookup_symbol($3->name)->type != "int") {
-                                                                notIntErr($3->name);
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "int") == 0) {
+                                                                if (sym1->valueInt > sym2->valueInt)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                if (sym1->valueFloat > sym2->valueFloat)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
                                                             }
                                                         }   
                                                     }
      | expr ANDOP expr                              {
-                                                          
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
+                                                            }
+                                                        }
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "bool") == 0) {
+                                                                
+                                                                if (strcmp(sym1->valueString, "true") == 0 && strcmp(sym2->valueString, "true") == 0)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            }
+                                                        }
                                                     }
      | expr OROP expr                               {
-                                                          
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
+                                                            }
+                                                        }
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "bool") == 0) {
+                                                                
+                                                                if (strcmp(sym1->valueString, "true") == 0 || strcmp(sym2->valueString, "true") == 0)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            }
+                                                        }
                                                     }
-     | expr NEQOP expr                              
-     | expr EQOP expr
+     | expr NEQOP expr                              {
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
+                                                            }
+                                                        }
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "bool") == 0) {
+                                                                
+                                                                if (strcmp(sym1->valueString, "true") == 0 && strcmp(sym2->valueString, "false") == 0)
+                                                                    strcpy($$->valueString, "true");
+                                                                else if (strcmp(sym1->valueString, "false") == 0 && strcmp(sym2->valueString, "true") == 0)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "int") == 0) {
+                                                                if (sym1->valueInt != sym2->valueInt)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                if (sym1->valueFloat != sym2->valueFloat)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "string") == 0 || strcmp(sym1->type, "char") == 0) {
+                                                                if (strcmp(sym1->valueString, sym2->valueString) != 0)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            }
+                                                        }
+                                                    }
+     | expr EQOP expr                               {
+                                                        struct symbol *sym1 = lookup_symbol($1->name);
+                                                        struct symbol *sym2 = lookup_symbol($3->name);
+
+                                                        if (sym1 == NULL) {
+                                                            notDefinedErr($1->name);
+                                                        } else {
+                                                            if (sym1->dataType == 1) {
+                                                                notVarErr($1->name);
+                                                            }
+                                                        }
+
+                                                        if (strcmp(sym1->type, sym2->type) != 0) {
+                                                            typeErr(sym1->name, sym2->name);
+                                                        } else {
+                                                            if (strcmp(sym1->type, "bool") == 0) {
+                                                                
+                                                                if (strcmp(sym1->valueString, sym2->valueString) == 0)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "int") == 0) {
+                                                                if (sym1->valueInt == sym2->valueInt)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "float") == 0) {
+                                                                if (sym1->valueFloat == sym2->valueFloat)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            } else if (strcmp(sym1->type, "string") == 0 || strcmp(sym1->type, "char") == 0) {
+                                                                if (strcmp(sym1->valueString, sym2->valueString) == 0)
+                                                                    strcpy($$->valueString, "true");
+                                                                else
+                                                                    strcpy($$->valueString, "false");
+                                                            }
+                                                        }
+                                                    }
      | DIFFOP expr                                  
      | '-' expr
      | primitives
@@ -747,41 +998,61 @@ primitives : ID RTRNARROW ID                        {
 int yyerror(char * s)
 {
     printf("Error: %s at line: %d\n!", s, yylineno);
+    exit(1);
 }
 
 void notDefinedErr(char *s)
 {
     printf("Error: %s is not defined at line: %d!\n", s, yylineno);
+    exit(1);
 }
 
 void prevDefinedErr(char *s)
 {
     printf("Error: %s is already defined at line: %d!\n", s, yylineno);
+    exit(1);
+}
+
+void notVarErr(char *s)
+{
+    printf("Error: %s is not a variable at line: %d!\n", s, yylineno);
+    exit(1);
 }
 
 void notIntErr(char *s)
 {
     printf("Error: %s is not an integer at line: %d!\n", s, yylineno);
+    exit(1);
 }
 
 void notArrErr(char *s)
 {
     printf("Error: %s is not an array at line: %d!\n", s, yylineno);
+    exit(1);
 }
 
 void notFuncErr(char *s)
 {
     printf("Error: %s is not a function at line: %d!\n", s, yylineno);
+    exit(1);
 }
 
 void notObjErr(char *s)
 {
     printf("Error: %s is not an object at line: %d!\n", s, yylineno);
+    exit(1);
 }
 
 void typeErr(char *t1, char *t2)
 {
     printf("Error: %s and %s are not of the same type at line: %d!\n", t1, t2, yylineno);
+    exit(1);
+}
+
+void divByZeroErr()
+{
+    printf("Error: Division by zero at line: %d!\n", yylineno);
+    exit(1);
 }
 
 int main(int argc, char *argv[])

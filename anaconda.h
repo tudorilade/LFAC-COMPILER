@@ -35,8 +35,8 @@ void initSymbolTable()
     count = 0;
 
     FILE *file = fopen("symbol_table_functions.txt", "w");
-    fprintf(file, "Name      \tDataType  \tType      \tValue      \tArraySize\tNrOfParams\n");
-    fprintf(file, "----------------------------------------------------------------------\n");
+    fprintf(file, "Name      \tDataType  \tType      \tNrOfParams\n");
+    fprintf(file, "----------------------------------------------\n");
     fclose(file);
 }
 
@@ -288,7 +288,7 @@ void print_symbol_table(FILE *file)
 
             //write in symbol_table_functions.txt
             FILE *file2 = fopen("symbol_table_functions.txt", "a");
-            fprintf(file2, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10d\n", s->name, "Function", s->type, "N\\A", "N\\A", s->numberOfParameters);
+            fprintf(file2, "%-10s\t%-10s\t%-10s\t%-10d\n", s->name, "Function", s->type, s->numberOfParameters);
             fclose(file2);
         }
         else if (s->dataType == 3)
