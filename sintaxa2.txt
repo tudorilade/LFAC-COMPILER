@@ -1,7 +1,78 @@
 GLOBAL
-    be t: char;
-    be c: int;
-    be x: char, i: int;
-    be tmp: int;
-    be t: bool;
+    be a_str: string;
+    be b_str: string;
+    be a_char: char, a_float: float, d_float: float;
+    be arr[5]: int;
+    be arr2[10]: int;
+    be a_int: int;
+    be b_int: int;
+    be tmp: bool;
 END_GLOBAL
+
+FUNC
+    def func(c: int, d: int) -> int {};
+    def func1(e: int, f: int, b: float) -> int{
+        b_int := -23;
+    };
+    def func2() -> string{
+        b_str := "world";
+        a_char := "2";
+    };
+
+END_FUNC
+
+OBJECT
+    object MyObj1[
+    ];
+
+    object MyObj2[];
+
+    object MyObj3
+    [
+        attr h_int: int, b_char: char;
+        attr c_float: float;
+        
+        method func3(c: int, d: int) -> int;
+        method func4(d: float, y:float) -> float;
+    ];
+
+    object MyObj5[
+    ];
+
+    impl func5(c: int, d: int) -> int of MyObj3 {
+         a_str := "hello";
+    };
+
+    object MyObj6[
+        attr x1: string, tmp1: float;
+    ];
+
+        object MyObj7[
+        attr x2: string, tmp2: float;
+    ];
+
+    impl func6() -> string of MyObj6 {};
+
+    object Myobj10[];
+
+    object Myobj11 : inherit Myobj10 [
+        attr x3: int;
+        method func0(c: int, d: int) -> int;
+    ];
+
+    impl func7(c: int, d: int) -> int of Myobj11{};
+END_OBJECT
+
+BEGIN_PROGRAM
+    c_float := 11231.1231;
+    d_float := -0.123131;
+    b_char := "u";
+    a_float := -0.987;
+    tmp := "true";
+    x3 := 3;
+
+    c_float := c_float + d_float;
+    x2 := a_str + b_str;
+
+
+END_PROGRAM

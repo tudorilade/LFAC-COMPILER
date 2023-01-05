@@ -50,94 +50,109 @@ extern int yydebug;
   enum yytokentype
   {
     ID = 258,
-    TIP = 259,
-    BGIN = 260,
-    END = 261,
-    ASSIGN = 262,
-    NR = 263,
-    DECLAR = 264,
-    GLOBAL = 265,
-    ENDGLOBAL = 266,
-    OBJECT = 267,
-    ENDOBJECT = 268,
-    DECLATTR = 269,
-    DECLMETHOD = 270,
-    DECLOBJECT = 271,
-    FUNC = 272,
-    ENDFUNC = 273,
-    RTRNARROW = 274,
-    FUNCDEF = 275,
-    IMPL = 276,
-    OF = 277,
-    INHERIT = 278,
-    IFCLAUSE = 279,
-    ELSECLAUSE = 280,
-    ELIFCLAUSE = 281,
-    WHILECLAUSE = 282,
-    FORCLAUSE = 283,
-    LESSOP = 284,
-    LESSEQOP = 285,
-    GREATEROP = 286,
-    GREATEREQ = 287,
-    NEQOP = 288,
-    EQOP = 289,
-    OROP = 290,
-    ANDOP = 291,
-    DIFFOP = 292,
-    TRUEP = 293,
-    FALSEP = 294,
-    COMMENT = 295
+    INT = 259,
+    FLOAT = 260,
+    BOOL = 261,
+    CHAR = 262,
+    STRING = 263,
+    ARRAY = 264,
+    TIP = 265,
+    BGIN = 266,
+    END = 267,
+    ASSIGN = 268,
+    DECLAR = 269,
+    GLOBAL = 270,
+    ENDGLOBAL = 271,
+    OBJECT = 272,
+    ENDOBJECT = 273,
+    DECLATTR = 274,
+    DECLMETHOD = 275,
+    DECLOBJECT = 276,
+    FUNC = 277,
+    ENDFUNC = 278,
+    RTRNARROW = 279,
+    FUNCDEF = 280,
+    IMPL = 281,
+    OF = 282,
+    INHERIT = 283,
+    IFCLAUSE = 284,
+    ELSECLAUSE = 285,
+    ELIFCLAUSE = 286,
+    WHILECLAUSE = 287,
+    FORCLAUSE = 288,
+    LESSOP = 289,
+    LESSEQOP = 290,
+    GREATEROP = 291,
+    GREATEREQ = 292,
+    NEQOP = 293,
+    EQOP = 294,
+    OROP = 295,
+    ANDOP = 296,
+    DIFFOP = 297,
+    TRUEP = 298,
+    FALSEP = 299,
+    COMMENT = 300
   };
 #endif
 /* Tokens.  */
 #define ID 258
-#define TIP 259
-#define BGIN 260
-#define END 261
-#define ASSIGN 262
-#define NR 263
-#define DECLAR 264
-#define GLOBAL 265
-#define ENDGLOBAL 266
-#define OBJECT 267
-#define ENDOBJECT 268
-#define DECLATTR 269
-#define DECLMETHOD 270
-#define DECLOBJECT 271
-#define FUNC 272
-#define ENDFUNC 273
-#define RTRNARROW 274
-#define FUNCDEF 275
-#define IMPL 276
-#define OF 277
-#define INHERIT 278
-#define IFCLAUSE 279
-#define ELSECLAUSE 280
-#define ELIFCLAUSE 281
-#define WHILECLAUSE 282
-#define FORCLAUSE 283
-#define LESSOP 284
-#define LESSEQOP 285
-#define GREATEROP 286
-#define GREATEREQ 287
-#define NEQOP 288
-#define EQOP 289
-#define OROP 290
-#define ANDOP 291
-#define DIFFOP 292
-#define TRUEP 293
-#define FALSEP 294
-#define COMMENT 295
+#define INT 259
+#define FLOAT 260
+#define BOOL 261
+#define CHAR 262
+#define STRING 263
+#define ARRAY 264
+#define TIP 265
+#define BGIN 266
+#define END 267
+#define ASSIGN 268
+#define DECLAR 269
+#define GLOBAL 270
+#define ENDGLOBAL 271
+#define OBJECT 272
+#define ENDOBJECT 273
+#define DECLATTR 274
+#define DECLMETHOD 275
+#define DECLOBJECT 276
+#define FUNC 277
+#define ENDFUNC 278
+#define RTRNARROW 279
+#define FUNCDEF 280
+#define IMPL 281
+#define OF 282
+#define INHERIT 283
+#define IFCLAUSE 284
+#define ELSECLAUSE 285
+#define ELIFCLAUSE 286
+#define WHILECLAUSE 287
+#define FORCLAUSE 288
+#define LESSOP 289
+#define LESSEQOP 290
+#define GREATEROP 291
+#define GREATEREQ 292
+#define NEQOP 293
+#define EQOP 294
+#define OROP 295
+#define ANDOP 296
+#define DIFFOP 297
+#define TRUEP 298
+#define FALSEP 299
+#define COMMENT 300
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 14 "anaconda.y"
+#line 43 "anaconda.y"
 
-    struct symbol_table *s;
+    int int_val; 
+    double float_val;
+    char *bool_val;
+    char char_val;
+    char *str_val;
+    struct symbol *s;
 
-#line 141 "y.tab.h"
+#line 156 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
