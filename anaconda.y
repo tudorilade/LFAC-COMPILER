@@ -2,28 +2,62 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include "anaconda.h"
+#include "anaconda.h"
 
 extern FILE* yyin;
 extern FILE* yyout;
 extern int yylineno;
 extern char* yytext;
 extern int ylex();
+
+struct symbol *updateSymbol(char *name, int valueInt, double valueFloat, char *valueString);
+
+void notDefinedErr(char *name);             //function that prints an error message when a symbol is not defined
+void prevDefinedErr(char *name);            //function that prints an error message when a symbol is already defined
+void notVarErr(char *name);                 //function that prints an error message when a symbol is not a variable
+void notIntErr(char *name);                 //function that prints an error message when a symbol is not an integer
+void notArrErr(char *name);                 //function that prints an error message when a symbol is not an array
+void notFuncErr(char *name);                //function that prints an error message when a symbol is not a function
+void notObjErr(char *name);                 //function that prints an error message when a symbol is not an object
+void typeErr(char *t1, char *t2);           //function that prints an error message when a symbol has a different type
+void divByZeroErr();                        //function that prints an error message when a division by zero is attempted
+
+int countpf;
+char const_type[100];
+struct symbol *sym;
 %}
 
 %union {
-    struct symbol_table *s;
+    int int_val; 
+    double float_val;
+    char *bool_val;
+    char char_val;
+    char *str_val;
+    struct symbol *s;
 }
 
-%token ID 
-%token TIP BGIN END ASSIGN INT FLOAT DECLAR
+
+%token <str_val> ID 
+%token <int_val> INT
+%token <float_val> FLOAT
+%token <bool_val> BOOL
+%token <char_val> CHAR
+%token <str_val> STRING
+%token ARRAY
+%token <str_val> TIP
+%token BGIN END ASSIGN DECLAR
 %token GLOBAL ENDGLOBAL 
-%token OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
-%token FUNC ENDFUNC RTRNARROW FUNCDEF 
+%token <s> OBJECT ENDOBJECT DECLATTR DECLMETHOD DECLOBJECT
+%token <s> FUNC
+%token ENDFUNC RTRNARROW FUNCDEF 
 %token IMPL OF INHERIT
 %token IFCLAUSE ELSECLAUSE ELIFCLAUSE WHILECLAUSE FORCLAUSE
-%token LESSOP LESSEQOP GREATEROP GREATEREQ NEQOP EQOP OROP
-%token ANDOP DIFFOP TRUEP FALSEP COMMENT
+%token LESSOP LESSEQOP GREATEROP GREATEREQ NEQOP EQOP OROP ANDOP DIFFOP
+%token <str_val> TRUEP FALSEP COMMENT
+
+%type <s> param object 
+
+
 %left '+' '-'
 %left '*' '/'
 %right DIFFOP
@@ -48,8 +82,22 @@ params : param
        | params ',' param
        ;
 
-param : ID ':' TIP 
-      | ID '[' INT ']' ':' TIP
+param : ID ':' TIP  { 
+                        if(lookup_symbol($1) == NULL){
+                            if(strcmp($3, "float") == 0)
+                                insertSymbolFloat($1, 0.0);
+                            else if(strcmp($3, "int") == 0)
+                                insertSymbolInt($3, 0);
+                            else if(strcmp($3, "bool") == 0)
+                                insertSymbolBool($3, "");
+                            else if(strcmp($3, "string") == 0)
+                                insertSymbolString($3, "");
+                        }else
+                        {
+                            prevDefinedErr($1);
+                        }
+                    }
+      | ID '[' INT ']' ':' TIP {}
       ;
 
 /* FUNC SECTION */
@@ -238,10 +286,63 @@ int yyerror(char * s)
     printf("eroare: %s la linia: %d\n", s, yylineno);
 }
 
+void notDefinedErr(char *s)
+{
+    printf("Error: %s is not defined at line: %d!\n", s, yylineno);
+    exit(1);
+}
+
+void prevDefinedErr(char *s)
+{
+    printf("Error: %s is already defined at line: %d!\n", s, yylineno);
+    exit(1);
+}
+
+void notVarErr(char *s)
+{
+    printf("Error: %s is not a variable at line: %d!\n", s, yylineno);
+    exit(1);
+}
+
+void notIntErr(char *s)
+{
+    printf("Error: %s is not an integer at line: %d!\n", s, yylineno);
+    exit(1);
+}
+
+void notArrErr(char *s)
+{
+    printf("Error: %s is not an array at line: %d!\n", s, yylineno);
+    exit(1);
+}
+
+void notFuncErr(char *s)
+{
+    printf("Error: %s is not a function at line: %d!\n", s, yylineno);
+    exit(1);
+}
+
+void notObjErr(char *s)
+{
+    printf("Error: %s is not an object at line: %d!\n", s, yylineno);
+    exit(1);
+}
+
+void typeErr(char *t1, char *t2)
+{
+    printf("Error: %s and %s are not of the same type at line: %d!\n", t1, t2, yylineno);
+    exit(1);
+}
+
+void divByZeroErr()
+{
+    printf("Error: Division by zero at line: %d!\n", yylineno);
+    exit(1);
+}
 
 int main(int argc, char *argv[])
 {
-    init_symbol_table();
+    initSymbolTable();
 
     if (argc)
     {

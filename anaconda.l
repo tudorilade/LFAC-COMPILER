@@ -11,6 +11,8 @@ void yyerror(char *s);
 %}
 
 %option noyywrap
+%option noinput nounput
+
 
 %%
 "be" {return DECLAR;}
@@ -56,16 +58,14 @@ void yyerror(char *s);
 
 "int"|"float"|"char"|"string"|"bool" {return TIP;}
 
-[_a-zA-Z][_a-zA-Z0-9]* { 
-                            if (lookup_symbol(yytext) == NULL && lookup_symbol_in_scope(yytext, -1) == NULL) 
-                                insert_symbol(yytext, 2, -1, -1, -1, -1, -1);
-                            yylval.s = lookup_symbol(yytext);
-                                
-                            return ID;
+[_a-zA-Z][_a-zA-Z0-9]* { return ID;
                         }
 ":=" {return ASSIGN;}
-[1-9][0-9]*|0 { return INT; }
-[1-9][0-9]*\.[0-9]+|0*\.[0-9]+ { return FLOAT; }
+
+(-)?[1-9][0-9]*|0 { return INT; }
+
+(-)?[1-9][0-9]*\.[0-9]+|(-)?0*\.[0-9]+ { return FLOAT; }
+
 [ \t] ;
 \n {yylineno++;}
 . {return yytext[0];}
