@@ -70,9 +70,12 @@ BEGIN_PROGRAM
     a_float := -0.987;
     tmp := "true";
     x3 := 3;
-
     c_float := c_float + d_float;
     x2 := a_str + b_str;
+
+    if x3 < 5 {
+        c_float := c_float + 3;
+    };
 
 
 END_PROGRAM

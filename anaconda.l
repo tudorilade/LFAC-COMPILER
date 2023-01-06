@@ -54,8 +54,7 @@ void pprint(char *token_type);
 "END_PROGRAM"   { return END; }
 
 "int"|"float"|"char"|"string"|"bool"    {
-                                            yylval.str_val = (char*)malloc(strlen(yytext) + 1); 
-                                            strcpy(yylval.str_val, yytext);  
+                                            yylval.str_val = strdup(yytext); 
                                             return TIP;
                                         }
 
@@ -65,18 +64,17 @@ void pprint(char *token_type);
                                         }
 
 \".*\"|\".\"|\"[0-9]\"                  { 
-                                            yylval.str_val = (char*)malloc(strlen(yytext) + 1); 
-                                            strcpy(yylval.str_val, yytext); 
+                                            yylval.str_val = strdup(yytext); 
                                             return STRING; 
                                         }
 
 (-)?[1-9][0-9]*|0                       { 
-                                            yylval.int_val = atoi(yytext); 
+                                            yylval.str_val = strdup(yytext); 
                                             return INT; 
                                         }
 
-(-)?[1-9][0-9]*\.[0-9]+|(-)?0*\.[0-9]+      { 
-                                            yylval.float_val = atof(yytext); 
+(-)?[1-9][0-9]*\.[0-9]+|(-)?0*\.[0-9]+  { 
+                                            yylval.str_val = strdup(yytext);                                             
                                             return FLOAT; 
                                         }
 
