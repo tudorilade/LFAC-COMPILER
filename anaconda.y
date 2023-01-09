@@ -153,9 +153,8 @@ func_params : func_param                                    { countpf++; }
             | func_params ',' func_param                    { countpf++; }
             ;
 
-func_param : ID ':' TIP                                     {   // ar trebui sa permite duplicat aici. cautam lookup, sa facem match nu doar pe name, dar si pe dataType.
-                                                                //TODO
-                                                                if (lookup_symbol($1) != NULL) {
+func_param : ID ':' TIP                                     { 
+                                                                if (lookup_symbol_attr_func($1, "Func Param") != NULL) {
                                                                     insertSymbol($1, "Func Param", $3, NULL, "-1", -1);
                                                                 }
                                                             }
@@ -780,13 +779,13 @@ void print_expr_type(unsigned int type, char* identifier)
 }
 
 char * inttostr(int n) {
-    char * result;
+    char * number_str;
     if (n >= 0)
-        result = malloc(floor(log10(n)) + 2);
+        number_str = malloc(floor(log10(n)) + 2);
     else
-        result = malloc(floor(log10(n)) + 3);
-    sprintf(result, "%d", n);
-    return result;
+        number_str = malloc(floor(log10(n)) + 3);
+    sprintf(number_str, "%d", n);
+    return number_str;
 }
 
 int main(int argc, char *argv[])
