@@ -4,9 +4,7 @@ GLOBAL
     be f1: float;
     be s: string;
     be x1: int;
-    be x1: int;
-    be f1: float;
-    be s: string;
+    be x2: int;
     be b_int: int;
     be arr2[5]: int;
 END_GLOBAL
@@ -19,10 +17,6 @@ FUNC
             };
         };
     };
-
-    def testFunction(c: float, d: float) -> float{
-        b_int := -53;
-    }
 
 
     def test(param1: int) -> int{
@@ -66,19 +60,13 @@ END_OBJECT
 BEGIN_PROGRAM
     f1 := 50.0;
     s := "ana";
-    x3 := arr2[7];
 
     x3 := x + 2;
-	f1 := x + x2;
-	f1 := test(5) + x;
-    x := test(5) + f1; 
-	x := s + f1;
 
     test(f1);
-	test(5,f1);
-	TypeOf(f1+x);
-    Eval(f1);
-    Eval(f1+x);
+	typeof(f1+x);
+    eval(f1);
+    eval(f1+x);
 	test(5+f1);
 
 
