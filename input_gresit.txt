@@ -4,7 +4,11 @@ GLOBAL
     be f1: float;
     be s: string;
     be x1: int;
+    be x1: int;
+    be f1: float;
+    be s: string;
     be b_int: int;
+    be arr2[5]: int;
 END_GLOBAL
 
 FUNC
@@ -16,6 +20,9 @@ FUNC
         };
     };
 
+    def testFunction(c: float, d: float) -> float{
+        b_int := -53;
+    }
 
 
     def test(param1: int) -> int{
@@ -59,6 +66,7 @@ END_OBJECT
 BEGIN_PROGRAM
     f1 := 50.0;
     s := "ana";
+    x3 := arr2[7];
 
     x3 := x + 2;
 	f1 := x + x2;

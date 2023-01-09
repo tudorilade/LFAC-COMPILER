@@ -1,2 +1,5 @@
 Name           	DataType       	Type           	NrOfParams     
 ------------------------------------------------------------
+test           	Function       	int            	3              
+func1          	Function       	int            	3              
+func           	Function       	int            	2              
