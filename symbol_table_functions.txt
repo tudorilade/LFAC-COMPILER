@@ -1,11 +1,2 @@
-Name      	DataType  	Type      	NrOfParams
-----------------------------------------------
-func7     	Function  	int       	2         
-func0     	Function  	int       	2         
-func6     	Function  	string    	0         
-func5     	Function  	int       	2         
-func4     	Function  	float     	2         
-func3     	Function  	int       	2         
-func2     	Function  	string    	0         
-func1     	Function  	int       	3         
-func      	Function  	int       	2         
+Name           	DataType       	Type           	NrOfParams     
+------------------------------------------------------------

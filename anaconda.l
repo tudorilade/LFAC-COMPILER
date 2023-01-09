@@ -15,6 +15,8 @@ void pprint(char *token_type);
 "be"            { return DECLAR; }
 "of"            { return OF; }
 "impl"          { return IMPL; }
+"eval"          { return EVAL; }
+"typeof"        { return TYPEOF;} 
 
 "GLOBAL"        { return GLOBAL; }
 "END_GLOBAL"    { return ENDGLOBAL; }
@@ -53,7 +55,7 @@ void pprint(char *token_type);
 "BEGIN_PROGRAM" { return BGIN; }
 "END_PROGRAM"   { return END; }
 
-"int"|"float"|"char"|"string"|"bool"    {
+"int"|"float"|"string"|"bool"    {
                                             yylval.str_val = strdup(yytext); 
                                             return TIP;
                                         }

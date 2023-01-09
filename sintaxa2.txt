@@ -1,7 +1,7 @@
 GLOBAL
     be a_str: string;
     be b_str: string;
-    be a_char: char, a_float: float, d_float: float;
+    be a_float: float, d_float: float;
     be arr[5]: int;
     be arr2[10]: int;
     be a_int: int;
@@ -14,12 +14,14 @@ FUNC
     def func1(e: int, f: int, b: float) -> int{
         b_int := -23;
     };
+
     def func2() -> string{
         b_str := "world";
-        a_char := "2";
+        a_str := "2";
     };
 
 END_FUNC
+
 
 OBJECT
     object MyObj1[
@@ -29,7 +31,7 @@ OBJECT
 
     object MyObj3
     [
-        attr h_int: int, b_char: char;
+        attr h_int: int, b_string: string;
         attr c_float: float;
         
         method func3(c: int, d: int) -> int;
@@ -46,8 +48,7 @@ OBJECT
     object MyObj6[
         attr x1: string, tmp1: float;
     ];
-
-        object MyObj7[
+    object MyObj7[
         attr x2: string, tmp2: float;
     ];
 
@@ -66,15 +67,59 @@ END_OBJECT
 BEGIN_PROGRAM
     c_float := 11231.1231;
     d_float := -0.123131;
-    b_char := "u";
+    b_str := "u";
     a_float := -0.987;
-    tmp := "true";
-    x3 := 3;
-    c_float := c_float + d_float;
-    x2 := a_str + b_str;
+    a_int := 3;
+
+    while x >= 10 {
+    Myobj3->d := func(1, "231");
+    Myobj3->x := Myobj3->func2(4, "1231");
+    Myobj4->func2("1231", Myobj3->d);
+
+    if [b + 4] and 5 {
+        t := "c";
+        x := [c * 3] + [c - 2] * 2;
+    };
+
+    while [not c != 1+2] and [d+func(1, func(3) + 6) <= a[5]] or [d != false and x >= 3]{
+        x := 1;
+
+        if b < 5 {
+            be c: float := y->d;
+        }
+        elif d >= 5 {
+            Myobj3->func1(1, "1231");
+            c := 1 + 3;
+            if [d - func(1)] == Myobj3->func1(1, "1231"){
+                c := c + 1;
+            };
+        }
+        else{
+            Myobj1->func1(1, "1231");
+        };
+    };
+
+    for x:=4+func(1); x+1 <= 10; x := x + 1{
+
+        if [b + 4] and not 5 {
+            t := "c";
+            x := [c * 3] +  [c - 2] * 2;
+        };
+
+    };
+};
+
+    eval(10 * [1 * 3 + 5]);
+    typeof(10 * [1 + [5 - 10] * 10] * 321);
+
+    func1(1, 2, 5);
+
+    a_int := func1(1, 2, 5);
+
+    arr2[5] := 5;
 
     if x3 < 5 {
-        c_float := c_float + 3;
+        a_int := a_int + [10 * 3 + 5];
     };
 
 
