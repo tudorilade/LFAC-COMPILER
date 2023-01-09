@@ -4,9 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 #define MAX_SYMBOLS 100
 #define MAXTOKENLEN 40
 #define MAXIDLEN 20
+#define DATATYPESIZE 15
+#define NOTDEFINED "N\\A"
 extern char *yytext;
 int count = 0;
 int dataType;
@@ -14,15 +17,31 @@ char *type;
 int value;
 int inDataType;
 
+
+typedef enum {
+    NUMBER = 1,
+    OPERATOR = 2,
+    IDENTIFICATOR = 3,
+    STRINGG = 4,
+    BOOLL = 5,
+    CHARR = 6,
+    FLOATT = 7
+
+} DATATYPE ;
+
+typedef struct exprinfo
+ {
+    struct AST* ast;
+    DATATYPE type;
+ } exprf;
+
 struct symbol
 {
-    char name[MAXTOKENLEN];         // name of the variable
-    int dataType;                   // 0 - variable, 1 - array, 2 - function, 2 - object
-    char type[MAXIDLEN];            // int, float, char, string, bool
-    int valueInt;                   // value of the variable, applicaple only for int variables
-    double valueFloat;              // value of the variable, applicaple only for float variables
-    char valueString[MAXTOKENLEN];  // value of the variable, applicaple only for char/string/bool variables
-    int arraySize;                  // size of the array, applicaple only for vectors
+    char* name;         // name of the variable
+    char* dataType;                   // 0 - variable, 1 - array, 2 - function, 2 - object
+    char* type;            // int, float, char, string, bool
+    char* value;                   // length
+    char* arraySize;                 // size of the array, applicaple only for vectors
     int numberOfParameters;         // number of parameters, applicaple only for functions
     struct symbol *next;            // pointer to the next symbol in the list
 };
@@ -35,195 +54,125 @@ void initSymbolTable()
     count = 0;
 
     FILE *file = fopen("symbol_table_functions.txt", "w");
-    fprintf(file, "Name      \tDataType  \tType      \tNrOfParams\n");
-    fprintf(file, "----------------------------------------------\n");
+
+    fprintf(file, "%-15s\t%-15s\t%-15s\t%-15s\n", "Name", "DataType", "Type", "NrOfParams");
+    for(int i = 0; i < 60; i++)
+        fprintf(file, "-");
+    fprintf(file, "\n");
     fclose(file);
 }
 
-void insertSymbolInt(char *name, int valueInt)
+
+struct symbol* createSymbol(char* name, char* datatype, char* type, char* value, char* arraySize, int nrParams)
 {
     struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
-
     if (count == MAX_SYMBOLS)
     {
         printf("Symbol table full!");
         exit(1);
     }
 
-    strcpy(s->name, name);
-    s->dataType = 0;
-    strcpy(s->type, "int");
-    s->valueInt = valueInt;
-    s->valueFloat = 0.0;
-    strcpy(s->valueString, "");
-    s->arraySize = 0;
-    s->numberOfParameters = 0;
+    s->name = strdup(name);
+    s->dataType = strdup(datatype);
 
-    s->next = sym_table;
-    sym_table = s;
+    if(type == NULL)
+    {
+        s->type = strdup(NOTDEFINED);
+    }
+    else
+    {
+        s->type = strdup(type);
+    }
+
+
+    if(value == NULL)
+    {
+        s->value = strdup(NOTDEFINED);
+    }
+    else
+    {
+        s->value = strdup(value);
+    }
+
+    s->arraySize = strdup(arraySize);
+    s->numberOfParameters = nrParams;
+    return s;
 }
 
-void insertSymbolFloat(char *name, double valueFloat)
+void add_constants(char* name, char* type, char* value)
 {
     struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
-
     if (count == MAX_SYMBOLS)
     {
         printf("Symbol table full!");
         exit(1);
     }
 
-    strcpy(s->name, name);
-    s->dataType = 0;
-    strcpy(s->type, "float");
-    s->valueInt = 0;
-    s->valueFloat = valueFloat;
-    strcpy(s->valueString, "");
-    s->arraySize = 0;
-    s->numberOfParameters = 0;
+    s->name = strdup(name);
+    s->dataType = strdup("Constants");
+
+    if(type == NULL)
+    {
+        s->type = strdup(NOTDEFINED);
+    }
+    else
+    {
+        s->type = strdup(type);
+    }
+
+
+    if(value == NULL)
+    {
+        s->value = strdup(NOTDEFINED);
+    }
+    else
+    {
+        s->value = strdup(value);
+    }
 
     s->next = sym_table;
     sym_table = s;
+
 }
 
-void insertSymbolChar(char *name, char *valueString)
+void insertSymbol(char* name, char* datatype, char* type, char* value, char* arraySize, int nrParams)
 {
     struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
-
     if (count == MAX_SYMBOLS)
     {
         printf("Symbol table full!");
         exit(1);
     }
 
-    strcpy(s->name, name);
-    s->dataType = 0;
-    strcpy(s->type, "char");
-    s->valueInt = 0;
-    s->valueFloat = 0.0;
-    strcpy(s->valueString, valueString);
-    s->arraySize = 0;
-    s->numberOfParameters = 0;
+    s->name = strdup(name);
+    s->dataType = strdup(datatype);
 
-    s->next = sym_table;
-    sym_table = s;
-}
-
-void insertSymbolString(char *name, char *valueString)
-{
-    struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
-
-    if (count == MAX_SYMBOLS)
+    if(type == NULL)
     {
-        printf("Symbol table full!");
-        exit(1);
+        s->type = strdup(NOTDEFINED);
+    }
+    else
+    {
+        s->type = strdup(type);
     }
 
-    strcpy(s->name, name);
-    s->dataType = 0;
-    strcpy(s->type, "string");
-    s->valueInt = 0;
-    s->valueFloat = 0.0;
-    strcpy(s->valueString, valueString);
-    s->arraySize = 0;
-    s->numberOfParameters = 0;
 
-    s->next = sym_table;
-    sym_table = s;
-}
-
-void insertSymbolBool(char *name, char *valueString)
-{
-    struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
-
-    if (count == MAX_SYMBOLS)
+    if(value == NULL)
     {
-        printf("Symbol table full!");
-        exit(1);
+        s->value = strdup(NOTDEFINED);
+    }
+    else
+    {
+        s->value = strdup(value);
     }
 
-    strcpy(s->name, name);
-    s->dataType = 0;
-    strcpy(s->type, "bool");
-    s->valueInt = 0;
-    s->valueFloat = 0.0;
-    strcpy(s->valueString, valueString);
-    s->arraySize = 0;
-    s->numberOfParameters = 0;
-
+    s->arraySize = strdup(arraySize);
+    s->numberOfParameters = nrParams;
     s->next = sym_table;
     sym_table = s;
 }
 
-void insertSymbolArray(char *name, char *type, int arraySize)
-{
-    struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
 
-    if (count == MAX_SYMBOLS)
-    {
-        printf("Symbol table full!");
-        exit(1);
-    }
-
-    strcpy(s->name, name);
-    s->dataType = 1;
-    strcpy(s->type, type);
-    s->valueInt = 0;
-    s->valueFloat = 0.0;
-    strcpy(s->valueString, "");
-    s->arraySize = arraySize;
-    s->numberOfParameters = 0;
-
-    s->next = sym_table;
-    sym_table = s;
-}
-
-void insertSymbolFunction(char *name, char *type, int numberOfParameters)
-{
-    struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
-
-    if (count == MAX_SYMBOLS)
-    {
-        printf("Symbol table full!");
-        exit(1);
-    }
-
-    strcpy(s->name, name);
-    s->dataType = 2;
-    strcpy(s->type, type);
-    s->valueInt = 0;
-    s->valueFloat = 0.0;
-    strcpy(s->valueString, "");
-    s->arraySize = 0;
-    s->numberOfParameters = numberOfParameters;
-
-    s->next = sym_table;
-    sym_table = s;
-}
-
-void insertSymbolObject(char *name)
-{
-    struct symbol *s = (struct symbol *)malloc(sizeof(struct symbol));
-
-    if (count == MAX_SYMBOLS)
-    {
-        printf("Symbol table full!");
-        exit(1);
-    }
-
-    strcpy(s->name, name);
-    s->dataType = 3;
-    strcpy(s->type, "");
-    s->valueInt = 0;
-    s->valueFloat = 0.0;
-    strcpy(s->valueString, "");
-    s->arraySize = 0;
-    s->numberOfParameters = 0;
-
-    s->next = sym_table;
-    sym_table = s;
-}
-  
 struct symbol *lookup_symbol(char *name)
 {
     struct symbol *s;
@@ -233,71 +182,94 @@ struct symbol *lookup_symbol(char *name)
     return NULL;
 }
 
-struct symbol *updateSymbol(char *name, int valueInt, double valueFloat, char *valueString)
+struct symbol *lookup_symbol_attr_func(char *name, char* dataType)
 {
-    struct symbol *s = lookup_symbol(name);
-    strcpy(s->name, name);
-    s->valueInt = valueInt;
-    s->valueFloat = valueFloat;
-    strcpy(s->valueString, valueString);
+    struct symbol *s;
+    for (s = sym_table; s != NULL; s = s->next)
+        if (strcmp(s->name, name) == 0 && strcmp(s->dataType, dataType) == 0)
+            return s;
+    return NULL;
+}
+
+void updateSymbolAtr(char* name, char* value, char* dataType)
+{
+        struct symbol *s;
+        for (s = sym_table; s != NULL; s = s->next)
+            if (strcmp(s->name, name) == 0)
+            {
+                s->dataType = strdup(dataType);
+                return;
+            }
+}
+
+void updateSymbol(char *name, char* value, char* dataType, int type)
+{
+    /* 
+    NUMBER = 1,
+    OPERATOR = 2,
+    IDENTIFICATOR = 3,
+    STRINGG = 4,
+    BOOLL = 5,
+    CHARR = 6,
+    FLOATT = 7
+    */
+    struct symbol *s;
+    for (s = sym_table; s != NULL; s = s->next)
+        if (strcmp(s->name, name) == 0)
+            {
+                if(dataType != NULL)
+                {
+                    if(strcmp(dataType, s->dataType) == 0)
+                    {
+                        char* typed;
+                        switch(type)
+                        {
+                            case 1:
+                                typed = strdup("int");
+                                break;
+                            case 4:
+                                typed = strdup("string"); break;
+                             case 5:
+                                typed = strdup("bool"); break;
+                            case 7:
+                                typed = strdup("float"); break;
+                            case 6:
+                                typed = strdup("char"); break;
+                            case 3:
+                                typed = strdup(s->type); break;
+                        }
+                        if(strcmp(s->type, typed) != 0)
+                        {
+                            printf("Cannot assign %s to %s. Different types declaration: %s instead of %s\n", value, s->name, typed, s->type);
+                            exit(1);
+                        }
+                        s->value = strdup(value);
+                    }
+                }
+            }
 
     //printf("values: %d, %f, %s of symbol %s\n", s->valueInt, s->valueFloat, s->valueString, s->name);
-
-    return s;
 } 
 
 void print_symbol_table(FILE *file)
 {
     struct symbol *s;
 
-    fprintf(file, "Name      \tDataType  \tType      \tValue      \tArraySize\tNrOfParams\n");
-    fprintf(file, "----------------------------------------------------------------------\n");
+    fprintf(file, "%-15s\t%-15s\t%-15s\t%-15s\t%-15s\t%-15s\n", "Name", "DataType", "Type",  "Value", "ArraySize" , "NrOfParams");
+    for(int i = 0; i < 90; i++)
+        fprintf(file, "-");
+    fprintf(file, "\n");
 
     for (s = sym_table; s != NULL; s = s->next)
     {
-        if (s->dataType == 0)
-        {
-            if (strcmp(s->type, "int") == 0)
-            {
-                fprintf(file, "%-10s\t%-10s\t%-10s\t%-10d\t%-10s\t%-10s\n", s->name, "Variable", s->type, s->valueInt, "N\\A", "N\\A");
-            }
-            else if (strcmp(s->type, "float") == 0)
-            {
-                fprintf(file, "%-10s\t%-10s\t%-10s\t%-10f\t%-10s\t%-10s\n", s->name, "Variable", s->type, s->valueFloat, "N\\A", "N\\A");
-            }
-            else if (strcmp(s->type, "bool") == 0)
-            {
-                fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "Variable", s->type, s->valueString, "N\\A", "N\\A");
-            }
-            else if (strcmp(s->type, "string") == 0)
-            {
-                fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "Variable", s->type, s->valueString, "N\\A", "N\\A");
-            }
-            else if (strcmp(s->type, "char") == 0)
-            {
-                fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "Variable", s->type, s->valueString, "N\\A", "N\\A");
-            }
-        }
-        else if (s->dataType == 1)
-        {
-            fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10d\t%-10s\n", s->name, "Vector", s->type, "N\\A", s->arraySize, "N\\A");
-        }
-        else if (s->dataType == 2)
-        {
-            fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10d\n", s->name, "Function", s->type, "N\\A", "N\\A", s->numberOfParameters);
+        fprintf(file, "%-15s\t%-15s\t%-15s\t%-15s\t%-15s\t%-15d\n", s->name, s->dataType, s->type, s->value, s->arraySize, s->numberOfParameters);
 
+        if (strcmp(s->dataType, "Function") == 0)
+        {
             //write in symbol_table_functions.txt
             FILE *file2 = fopen("symbol_table_functions.txt", "a");
-            fprintf(file2, "%-10s\t%-10s\t%-10s\t%-10d\n", s->name, "Function", s->type, s->numberOfParameters);
+            fprintf(file2, "%-15s\t%-15s\t%-15s\t%-15d\n", s->name, s->dataType, s->type, s->numberOfParameters);
             fclose(file2);
-        }
-        else if (s->dataType == 3)
-        {
-            fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "Object", "N\\A", "N\\A", "N\\A", "N\\A");
-        }
-        else
-        {
-            fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n", s->name, "Unknown", s->type, "N\\A", "N\\A", "N\\A");
         }
     }
 }
@@ -305,12 +277,200 @@ void print_symbol_table(FILE *file)
 void print_symbol_table_functions(FILE *file)
 {
     struct symbol *s;
+    fprintf(file, "%-15s\t%-15s\t%-15s\t%-15s\t%-15s\t%-15s\n", "Name", "DataType", "Type",  "Value", "ArraySize" , "NrOfParams");
+    for(int i = 0; i < 90; i++)
+        fprintf(file, "-");
+    fprintf(file, "\n");
 
-    fprintf(file, "Name      \tDataType  \tType      \tValue      \tArraySize\tNrOfParams");
-    fprintf(file, "----------------------------------------------------------------------");
-
-    if (s->dataType == 2)
+    if (strcmp(s->dataType, "Function") == 0)
     {
-        fprintf(file, "%-10s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10d", s->name, "Function", s->type, "N\\A", "N\\A", s->numberOfParameters);
+        fprintf(file, "%-15s\t%-15s\t%-15s\t%-15s\t%-15s\t%-15d", s->name, "Function", s->type, "N\\A", "N\\A", s->numberOfParameters);
     }
 }
+
+struct AST {
+    char* value;
+    int numbType;
+    struct AST *left;
+    struct AST *right;
+};
+
+
+struct AST* buildASTNode(char* value, struct AST* left, struct AST* right, int num)
+{    
+    struct AST *node = (struct AST*)malloc(sizeof(struct AST));
+    switch(num)
+    {
+        case 1:
+            node->value = strdup(value);
+            node->numbType = num;
+            node->left = left;
+            node->right = right;
+            break;
+        case 2:
+            switch(left->numbType)
+            {
+                case 4:
+                    printf("Arithmetic operands should be only int. Found STRING type!\n");
+                    exit(1);
+                case 5:
+                    printf("Arithmetic operands should be only int. Found BOOL type\n");
+                    exit(1);
+                case 6:
+                    printf("Arithmetic operands should be only int. Found CHAR type\n");
+                    exit(1);
+                case 7:
+                    node->value = strdup(value);
+                    node->numbType = num;
+                    node->left = left;
+                    node->right = right;
+                    // printf("Arithmetic operands should be only int. Found FLOAT type\n");
+                    // exit(1);
+            }
+            switch(right->numbType)
+            {
+                case 4:
+                    printf("Arithmetic operands should be only int. Found STRING type!\n");
+                    exit(1);
+                case 5:
+                    printf("Arithmetic operands should be only int. Found BOOL type\n");
+                    exit(1);
+                case 6:
+                    printf("Arithmetic operands should be only int. Found CHAR type\n");
+                    exit(1);
+                case 7:
+                    node->value = strdup(value);
+                    node->numbType = num;
+                    node->left = left;
+                    node->right = right;
+                    // printf("Arithmetic operands should be only int. Found FLOAT type\n");
+                    // exit(1);
+            }
+            node->value = strdup(value);
+            node->left = left;
+            node->numbType = num;
+            node->right = right;
+            break;
+        case 3:
+            if(lookup_symbol(value) == NULL){
+            
+                printf("Error: Identifier %s has not beend found\n", (value));
+                exit(1);
+            }
+            node->value = lookup_symbol(value)->name;
+            node->left = left;
+            node->right = right;
+            node->numbType = num;
+            break;
+        default:
+            node->value = strdup(value);
+            node->numbType = num;
+            node->left = left;
+            node->right = right;
+            break;
+        }
+    return node;
+}
+
+
+void free_AST(struct AST *node) {
+  if (node == NULL) return;
+  if (node->value != NULL) free(node->value);
+  if (node->left != NULL) free_AST(node->left);
+  if (node->right != NULL) free_AST(node->right);
+  free(node);
+}
+
+int eval_AST(struct AST *root) {
+    if(root == NULL) return 0;
+
+    if(root->numbType == 2)
+    {
+        if(strcmp(root->value, "+") == 0)
+        {
+            return eval_AST(root->left) + eval_AST(root->right);
+        }
+        else if(strcmp(root->value, "-") == 0)
+        {
+            return eval_AST(root->left) - eval_AST(root->right);
+    
+        }
+        else if(strcmp(root->value, "*") == 0)
+        {
+            return eval_AST(root->left) * eval_AST(root->right);
+
+        }
+        else if(strcmp(root->value, "/") == 0)
+        {
+            if(eval_AST(root->right) == 0)
+            {
+                printf("DIV BY 0 during evaluation\n");
+                exit(1);
+            }
+            return eval_AST(root->left) / eval_AST(root->right);
+
+        }
+        else
+        {
+            printf("error aici\n");
+            exit(1);
+        }
+    }
+
+    if(root->numbType == 3)
+    {
+        struct symbol *s = lookup_symbol(root->value);
+        if(s == NULL)
+        {
+            printf("Identifider %s not found during evaluation! \n", root->value);
+            exit(1); 
+        }
+        if(strcmp(s->type, "int") == 0)
+        {
+            return atoi(s->value);
+        }
+        else if(strcmp(s->type, "float") == 0)
+        {
+            return (int)atof(s->value);
+        }
+        else
+        {
+            printf("Arithmetic operands should be only int. Found %s type\n", s->type);
+            exit(1);
+        }
+    }
+    if(root->numbType == 1)
+    {
+        return atoi(root->value);
+    }
+}
+
+
+void exprError(char* inc, char* datatype1, char* datatype2)
+{
+    inc = strdup("Data types are incompatible. ");
+    strncat(inc, datatype1, strlen(datatype1));
+    strncat(inc, "and", strlen(" and "));
+    strncat(inc, datatype2, strlen(datatype2));
+}
+
+
+
+/* 
+var : ID { if ((sym = lookup_symbol($1)) == NULL) notDefinedErr($1);
+            else $$ = sym;
+          }                          
+                                                   
+    | ID RTRNARROW ID   {
+                         if (lookup_symbol($1) == NULL) notDefinedErr($1);
+                         else if ((sym = lookup_symbol_attr_func($3, "Attribute")) == NULL) notDefinedErr($3);
+                         else $$ = sym;
+                         }                           
+                                                                         
+    | ID '[' INT ']'  { if ((sym = lookup_symbol($1)) == NULL) prevDefinedErr($1);
+                        else $$ = sym;
+                      }
+    ;
+
+
+*/

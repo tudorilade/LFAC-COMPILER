@@ -1,0 +1,127 @@
+GLOBAL
+    be i: int;
+    be x: int;
+    be x1: int;
+    be x2: int;
+    be y: int;
+    be arr[10]: int;
+    be f: float;
+    be b1: bool;
+    be str_1: string;
+    be b_int: int;
+    be b_str: string;
+    be a_str: string;
+    be d_float: float;
+    be a_float: float;
+    be a_int: int;
+    be arr2[10]: int;
+    be b: int;
+    be t: string;
+    be c: int;
+END_GLOBAL
+
+FUNC
+    def func(c: int, d: int) -> int {
+        while i < 10{
+            if x > 10 and x < 50{
+                x2 := 45;
+            };
+        };
+    };
+
+    def func1(e: int, f: int, b: float) -> int{
+        b_int := -23;
+    };
+
+    def test(test_a: int, test_b: int, test_c: float) -> int{
+        b_int := -56;
+    };
+
+END_FUNC
+
+OBJECT
+    object MyObj1[
+    ];
+
+    object MyObj2[];
+
+    object Myobj3
+    [
+        attr h_int: int, b_string: string;
+        attr d: int;
+        attr c_float: float;
+        
+        method func3(c: int, d: int) -> int;
+        method func4(d: float, y:float) -> float;
+    ];
+
+    object MyObj5[
+    ];
+
+    impl func5(c: int, d: int) -> int of Myobj3 {
+         a_str := "hello";
+    };
+
+    object Myobj10[];
+
+    object Myobj11 : inherit Myobj10 [
+        attr x3: int;
+        method func0(c: int, d: int) -> int;
+    ];
+
+    impl func7(c: int, d: int) -> int of Myobj11{};
+
+END_OBJECT
+
+BEGIN_PROGRAM
+    c_float := 11231.1231;
+    d_float := -0.123131;
+    b_str := "u";
+    a_float := -0.987;
+    a_int := 3;
+
+    func1(1, 2, 5);
+
+    a_int := func1(1, 2, 5);
+
+    arr2[5] := 5;
+
+    if x3 < 5 {
+        a_int := a_int + [10 * 3 + 5];
+    };
+    while x >= 10 {
+        Myobj3->d := func(1, "231");
+        Myobj3->func3("1231", Myobj3->d);
+
+        for x := 1; x+1 <= 10; x := x + 1{
+
+            if [b + 4] == 5 {
+                t := "c";
+                arr2[1] := 10;
+
+            };
+
+        };
+    };
+
+    x := 10;
+    x1 := 20;
+    x2 := 30;
+    y := 30;
+
+    if x1 + test(x1, x2, f) < 5 + x1 and [[x > 2 or x1 < 4 + x2] or x2 == 2]{
+        x2 := 2;
+    };
+
+    x := test(test(x1, 3, f) + 2, y+4, 4) + [ 30 - y * arr[2] ] - 10;
+    x1 := x*100 + 5 * 100 + arr[2];
+
+    eval(x*10 - 100);
+    eval(x1);
+    eval(x2*10 - 200);
+    eval(x + test(x1,x,f)) ; 	
+    typeof(x+23);
+    typeof(f - 30.0);
+
+
+END_PROGRAM

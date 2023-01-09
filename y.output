@@ -1,0 +1,1521 @@
+Terminals unused in grammar
+
+    INHERIT
+
+
+Grammar
+
+    0 $accept: progr $end
+
+    1 progr: global func object_declar bloc_prog
+
+    2 global: GLOBAL global_declar ENDGLOBAL
+
+    3 global_declar: declaratie ';'
+    4              | global_declar declaratie ';'
+
+    5 declaratie: DECLAR params
+
+    6 params: param
+    7       | params ',' param
+
+    8 param: ID ':' TIP
+
+    9 func: FUNC func_declar ENDFUNC
+
+   10 func_declar: fun ';'
+   11            | func_declar fun ';'
+
+   12 fun: FUNCDEF body_func
+
+   13 body_func: ID '(' func_params ')' RTRNARROW TIP body_instr
+   14          | ID '(' ')' RTRNARROW TIP body_instr
+
+   15 func_params: func_param
+   16            | func_params ',' func_param
+
+   17 func_param: ID ':' TIP
+
+   18 body_instr: '{' list '}'
+   19           | '{' '}'
+
+   20 object_declar: OBJECT declar_objects ENDOBJECT
+
+   21 declar_objects: %empty
+   22               | objects impl_methods declar_objects
+
+   23 objects: object ';'
+   24        | objects object ';'
+
+   25 object: DECLOBJECT ID '[' inside_obj ']'
+   26       | DECLOBJECT ID '[' ']'
+
+   27 inside_obj: more_attributes
+   28           | more_methods
+   29           | more_attributes more_methods
+
+   30 more_attributes: attributes
+   31                | more_attributes attributes
+
+   32 attributes: attribute
+   33           | attributes ',' attribute
+
+   34 attribute: DECLATTR object_attributes ';'
+
+   35 object_attributes: params
+
+   36 more_methods: method ';'
+   37             | more_methods method ';'
+
+   38 method: DECLMETHOD body_method
+
+   39 body_method: ID '(' method_params ')' RTRNARROW TIP
+   40            | ID '(' ')' RTRNARROW TIP
+
+   41 method_params: method_param
+   42              | method_params ',' method_param
+
+   43 method_param: ID ':' TIP
+
+   44 impl_methods: impl_method ';'
+   45             | impl_methods impl_method
+
+   46 impl_method: IMPL body_method OF ID body_instr
+
+   47 obj_init: DECLAR some_objects
+
+   48 some_objects: obj
+   49             | some_objects ',' obj
+
+   50 obj: ID ':' ID '{' init_list '}'
+   51    | ID ':' ID '{' '}'
+
+   52 init_list: init_par
+   53          | init_list ',' init_par
+
+   54 init_par: ID
+   55         | NR
+
+   56 bloc_prog: BGIN list END
+
+   57 list: statement ';'
+   58     | list statement ';'
+
+   59 statement: assigment
+   60          | obj_init
+
+   61 assigment: ID ASSIGN ID
+   62          | ID ASSIGN NR
+   63          | ID ASSIGN '"' ID '"'
+   64          | ID ASSIGN '"' NR '"'
+   65          | ID '(' lista_apel ')'
+
+   66 lista_apel: NR
+   67           | lista_apel ',' NR
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '"' (34) 63 64
+    '(' (40) 13 14 39 40 65
+    ')' (41) 13 14 39 40 65
+    ',' (44) 7 16 33 42 49 53 67
+    ':' (58) 8 17 43 50 51
+    ';' (59) 3 4 10 11 23 24 34 36 37 44 57 58
+    '[' (91) 25 26
+    ']' (93) 25 26
+    '{' (123) 18 19 50 51
+    '}' (125) 18 19 50 51
+    error (256)
+    ID (258) 8 13 14 17 25 26 39 40 43 46 50 51 54 61 62 63 64 65
+    TIP (259) 8 13 14 17 39 40 43
+    BGIN (260) 56
+    END (261) 56
+    ASSIGN (262) 61 62 63 64
+    NR (263) 55 62 64 66 67
+    DECLAR (264) 5 47
+    GLOBAL (265) 2
+    ENDGLOBAL (266) 2
+    OBJECT (267) 20
+    ENDOBJECT (268) 20
+    DECLATTR (269) 34
+    DECLMETHOD (270) 38
+    DECLOBJECT (271) 25 26
+    FUNC (272) 9
+    ENDFUNC (273) 9
+    RTRNARROW (274) 13 14 39 40
+    FUNCDEF (275) 12
+    IMPL (276) 46
+    OF (277) 46
+    INHERIT (278)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (34)
+        on left: 0
+    progr (35)
+        on left: 1
+        on right: 0
+    global (36)
+        on left: 2
+        on right: 1
+    global_declar (37)
+        on left: 3 4
+        on right: 2 4
+    declaratie (38)
+        on left: 5
+        on right: 3 4
+    params (39)
+        on left: 6 7
+        on right: 5 7 35
+    param (40)
+        on left: 8
+        on right: 6 7
+    func (41)
+        on left: 9
+        on right: 1
+    func_declar (42)
+        on left: 10 11
+        on right: 9 11
+    fun (43)
+        on left: 12
+        on right: 10 11
+    body_func (44)
+        on left: 13 14
+        on right: 12
+    func_params (45)
+        on left: 15 16
+        on right: 13 16
+    func_param (46)
+        on left: 17
+        on right: 15 16
+    body_instr (47)
+        on left: 18 19
+        on right: 13 14 46
+    object_declar (48)
+        on left: 20
+        on right: 1
+    declar_objects (49)
+        on left: 21 22
+        on right: 20 22
+    objects (50)
+        on left: 23 24
+        on right: 22 24
+    object (51)
+        on left: 25 26
+        on right: 23 24
+    inside_obj (52)
+        on left: 27 28 29
+        on right: 25
+    more_attributes (53)
+        on left: 30 31
+        on right: 27 29 31
+    attributes (54)
+        on left: 32 33
+        on right: 30 31 33
+    attribute (55)
+        on left: 34
+        on right: 32 33
+    object_attributes (56)
+        on left: 35
+        on right: 34
+    more_methods (57)
+        on left: 36 37
+        on right: 28 29 37
+    method (58)
+        on left: 38
+        on right: 36 37
+    body_method (59)
+        on left: 39 40
+        on right: 38 46
+    method_params (60)
+        on left: 41 42
+        on right: 39 42
+    method_param (61)
+        on left: 43
+        on right: 41 42
+    impl_methods (62)
+        on left: 44 45
+        on right: 22 45
+    impl_method (63)
+        on left: 46
+        on right: 44 45
+    obj_init (64)
+        on left: 47
+        on right: 60
+    some_objects (65)
+        on left: 48 49
+        on right: 47 49
+    obj (66)
+        on left: 50 51
+        on right: 48 49
+    init_list (67)
+        on left: 52 53
+        on right: 50 53
+    init_par (68)
+        on left: 54 55
+        on right: 52 53
+    bloc_prog (69)
+        on left: 56
+        on right: 1
+    list (70)
+        on left: 57 58
+        on right: 18 56 58
+    statement (71)
+        on left: 59 60
+        on right: 57 58
+    assigment (72)
+        on left: 61 62 63 64 65
+        on right: 59
+    lista_apel (73)
+        on left: 66 67
+        on right: 65 67
+
+
+State 0
+
+    0 $accept: . progr $end
+
+    GLOBAL  shift, and go to state 1
+
+    progr   go to state 2
+    global  go to state 3
+
+
+State 1
+
+    2 global: GLOBAL . global_declar ENDGLOBAL
+
+    DECLAR  shift, and go to state 4
+
+    global_declar  go to state 5
+    declaratie     go to state 6
+
+
+State 2
+
+    0 $accept: progr . $end
+
+    $end  shift, and go to state 7
+
+
+State 3
+
+    1 progr: global . func object_declar bloc_prog
+
+    FUNC  shift, and go to state 8
+
+    func  go to state 9
+
+
+State 4
+
+    5 declaratie: DECLAR . params
+
+    ID  shift, and go to state 10
+
+    params  go to state 11
+    param   go to state 12
+
+
+State 5
+
+    2 global: GLOBAL global_declar . ENDGLOBAL
+    4 global_declar: global_declar . declaratie ';'
+
+    DECLAR     shift, and go to state 4
+    ENDGLOBAL  shift, and go to state 13
+
+    declaratie  go to state 14
+
+
+State 6
+
+    3 global_declar: declaratie . ';'
+
+    ';'  shift, and go to state 15
+
+
+State 7
+
+    0 $accept: progr $end .
+
+    $default  accept
+
+
+State 8
+
+    9 func: FUNC . func_declar ENDFUNC
+
+    FUNCDEF  shift, and go to state 16
+
+    func_declar  go to state 17
+    fun          go to state 18
+
+
+State 9
+
+    1 progr: global func . object_declar bloc_prog
+
+    OBJECT  shift, and go to state 19
+
+    object_declar  go to state 20
+
+
+State 10
+
+    8 param: ID . ':' TIP
+
+    ':'  shift, and go to state 21
+
+
+State 11
+
+    5 declaratie: DECLAR params .
+    7 params: params . ',' param
+
+    ','  shift, and go to state 22
+
+    $default  reduce using rule 5 (declaratie)
+
+
+State 12
+
+    6 params: param .
+
+    $default  reduce using rule 6 (params)
+
+
+State 13
+
+    2 global: GLOBAL global_declar ENDGLOBAL .
+
+    $default  reduce using rule 2 (global)
+
+
+State 14
+
+    4 global_declar: global_declar declaratie . ';'
+
+    ';'  shift, and go to state 23
+
+
+State 15
+
+    3 global_declar: declaratie ';' .
+
+    $default  reduce using rule 3 (global_declar)
+
+
+State 16
+
+   12 fun: FUNCDEF . body_func
+
+    ID  shift, and go to state 24
+
+    body_func  go to state 25
+
+
+State 17
+
+    9 func: FUNC func_declar . ENDFUNC
+   11 func_declar: func_declar . fun ';'
+
+    ENDFUNC  shift, and go to state 26
+    FUNCDEF  shift, and go to state 16
+
+    fun  go to state 27
+
+
+State 18
+
+   10 func_declar: fun . ';'
+
+    ';'  shift, and go to state 28
+
+
+State 19
+
+   20 object_declar: OBJECT . declar_objects ENDOBJECT
+
+    DECLOBJECT  shift, and go to state 29
+
+    $default  reduce using rule 21 (declar_objects)
+
+    declar_objects  go to state 30
+    objects         go to state 31
+    object          go to state 32
+
+
+State 20
+
+    1 progr: global func object_declar . bloc_prog
+
+    BGIN  shift, and go to state 33
+
+    bloc_prog  go to state 34
+
+
+State 21
+
+    8 param: ID ':' . TIP
+
+    TIP  shift, and go to state 35
+
+
+State 22
+
+    7 params: params ',' . param
+
+    ID  shift, and go to state 10
+
+    param  go to state 36
+
+
+State 23
+
+    4 global_declar: global_declar declaratie ';' .
+
+    $default  reduce using rule 4 (global_declar)
+
+
+State 24
+
+   13 body_func: ID . '(' func_params ')' RTRNARROW TIP body_instr
+   14          | ID . '(' ')' RTRNARROW TIP body_instr
+
+    '('  shift, and go to state 37
+
+
+State 25
+
+   12 fun: FUNCDEF body_func .
+
+    $default  reduce using rule 12 (fun)
+
+
+State 26
+
+    9 func: FUNC func_declar ENDFUNC .
+
+    $default  reduce using rule 9 (func)
+
+
+State 27
+
+   11 func_declar: func_declar fun . ';'
+
+    ';'  shift, and go to state 38
+
+
+State 28
+
+   10 func_declar: fun ';' .
+
+    $default  reduce using rule 10 (func_declar)
+
+
+State 29
+
+   25 object: DECLOBJECT . ID '[' inside_obj ']'
+   26       | DECLOBJECT . ID '[' ']'
+
+    ID  shift, and go to state 39
+
+
+State 30
+
+   20 object_declar: OBJECT declar_objects . ENDOBJECT
+
+    ENDOBJECT  shift, and go to state 40
+
+
+State 31
+
+   22 declar_objects: objects . impl_methods declar_objects
+   24 objects: objects . object ';'
+
+    DECLOBJECT  shift, and go to state 29
+    IMPL        shift, and go to state 41
+
+    object        go to state 42
+    impl_methods  go to state 43
+    impl_method   go to state 44
+
+
+State 32
+
+   23 objects: object . ';'
+
+    ';'  shift, and go to state 45
+
+
+State 33
+
+   56 bloc_prog: BGIN . list END
+
+    ID      shift, and go to state 46
+    DECLAR  shift, and go to state 47
+
+    obj_init   go to state 48
+    list       go to state 49
+    statement  go to state 50
+    assigment  go to state 51
+
+
+State 34
+
+    1 progr: global func object_declar bloc_prog .
+
+    $default  reduce using rule 1 (progr)
+
+
+State 35
+
+    8 param: ID ':' TIP .
+
+    $default  reduce using rule 8 (param)
+
+
+State 36
+
+    7 params: params ',' param .
+
+    $default  reduce using rule 7 (params)
+
+
+State 37
+
+   13 body_func: ID '(' . func_params ')' RTRNARROW TIP body_instr
+   14          | ID '(' . ')' RTRNARROW TIP body_instr
+
+    ID   shift, and go to state 52
+    ')'  shift, and go to state 53
+
+    func_params  go to state 54
+    func_param   go to state 55
+
+
+State 38
+
+   11 func_declar: func_declar fun ';' .
+
+    $default  reduce using rule 11 (func_declar)
+
+
+State 39
+
+   25 object: DECLOBJECT ID . '[' inside_obj ']'
+   26       | DECLOBJECT ID . '[' ']'
+
+    '['  shift, and go to state 56
+
+
+State 40
+
+   20 object_declar: OBJECT declar_objects ENDOBJECT .
+
+    $default  reduce using rule 20 (object_declar)
+
+
+State 41
+
+   46 impl_method: IMPL . body_method OF ID body_instr
+
+    ID  shift, and go to state 57
+
+    body_method  go to state 58
+
+
+State 42
+
+   24 objects: objects object . ';'
+
+    ';'  shift, and go to state 59
+
+
+State 43
+
+   22 declar_objects: objects impl_methods . declar_objects
+   45 impl_methods: impl_methods . impl_method
+
+    DECLOBJECT  shift, and go to state 29
+    IMPL        shift, and go to state 41
+
+    $default  reduce using rule 21 (declar_objects)
+
+    declar_objects  go to state 60
+    objects         go to state 31
+    object          go to state 32
+    impl_method     go to state 61
+
+
+State 44
+
+   44 impl_methods: impl_method . ';'
+
+    ';'  shift, and go to state 62
+
+
+State 45
+
+   23 objects: object ';' .
+
+    $default  reduce using rule 23 (objects)
+
+
+State 46
+
+   61 assigment: ID . ASSIGN ID
+   62          | ID . ASSIGN NR
+   63          | ID . ASSIGN '"' ID '"'
+   64          | ID . ASSIGN '"' NR '"'
+   65          | ID . '(' lista_apel ')'
+
+    ASSIGN  shift, and go to state 63
+    '('     shift, and go to state 64
+
+
+State 47
+
+   47 obj_init: DECLAR . some_objects
+
+    ID  shift, and go to state 65
+
+    some_objects  go to state 66
+    obj           go to state 67
+
+
+State 48
+
+   60 statement: obj_init .
+
+    $default  reduce using rule 60 (statement)
+
+
+State 49
+
+   56 bloc_prog: BGIN list . END
+   58 list: list . statement ';'
+
+    ID      shift, and go to state 46
+    END     shift, and go to state 68
+    DECLAR  shift, and go to state 47
+
+    obj_init   go to state 48
+    statement  go to state 69
+    assigment  go to state 51
+
+
+State 50
+
+   57 list: statement . ';'
+
+    ';'  shift, and go to state 70
+
+
+State 51
+
+   59 statement: assigment .
+
+    $default  reduce using rule 59 (statement)
+
+
+State 52
+
+   17 func_param: ID . ':' TIP
+
+    ':'  shift, and go to state 71
+
+
+State 53
+
+   14 body_func: ID '(' ')' . RTRNARROW TIP body_instr
+
+    RTRNARROW  shift, and go to state 72
+
+
+State 54
+
+   13 body_func: ID '(' func_params . ')' RTRNARROW TIP body_instr
+   16 func_params: func_params . ',' func_param
+
+    ','  shift, and go to state 73
+    ')'  shift, and go to state 74
+
+
+State 55
+
+   15 func_params: func_param .
+
+    $default  reduce using rule 15 (func_params)
+
+
+State 56
+
+   25 object: DECLOBJECT ID '[' . inside_obj ']'
+   26       | DECLOBJECT ID '[' . ']'
+
+    DECLATTR    shift, and go to state 75
+    DECLMETHOD  shift, and go to state 76
+    ']'         shift, and go to state 77
+
+    inside_obj       go to state 78
+    more_attributes  go to state 79
+    attributes       go to state 80
+    attribute        go to state 81
+    more_methods     go to state 82
+    method           go to state 83
+
+
+State 57
+
+   39 body_method: ID . '(' method_params ')' RTRNARROW TIP
+   40            | ID . '(' ')' RTRNARROW TIP
+
+    '('  shift, and go to state 84
+
+
+State 58
+
+   46 impl_method: IMPL body_method . OF ID body_instr
+
+    OF  shift, and go to state 85
+
+
+State 59
+
+   24 objects: objects object ';' .
+
+    $default  reduce using rule 24 (objects)
+
+
+State 60
+
+   22 declar_objects: objects impl_methods declar_objects .
+
+    $default  reduce using rule 22 (declar_objects)
+
+
+State 61
+
+   45 impl_methods: impl_methods impl_method .
+
+    $default  reduce using rule 45 (impl_methods)
+
+
+State 62
+
+   44 impl_methods: impl_method ';' .
+
+    $default  reduce using rule 44 (impl_methods)
+
+
+State 63
+
+   61 assigment: ID ASSIGN . ID
+   62          | ID ASSIGN . NR
+   63          | ID ASSIGN . '"' ID '"'
+   64          | ID ASSIGN . '"' NR '"'
+
+    ID   shift, and go to state 86
+    NR   shift, and go to state 87
+    '"'  shift, and go to state 88
+
+
+State 64
+
+   65 assigment: ID '(' . lista_apel ')'
+
+    NR  shift, and go to state 89
+
+    lista_apel  go to state 90
+
+
+State 65
+
+   50 obj: ID . ':' ID '{' init_list '}'
+   51    | ID . ':' ID '{' '}'
+
+    ':'  shift, and go to state 91
+
+
+State 66
+
+   47 obj_init: DECLAR some_objects .
+   49 some_objects: some_objects . ',' obj
+
+    ','  shift, and go to state 92
+
+    $default  reduce using rule 47 (obj_init)
+
+
+State 67
+
+   48 some_objects: obj .
+
+    $default  reduce using rule 48 (some_objects)
+
+
+State 68
+
+   56 bloc_prog: BGIN list END .
+
+    $default  reduce using rule 56 (bloc_prog)
+
+
+State 69
+
+   58 list: list statement . ';'
+
+    ';'  shift, and go to state 93
+
+
+State 70
+
+   57 list: statement ';' .
+
+    $default  reduce using rule 57 (list)
+
+
+State 71
+
+   17 func_param: ID ':' . TIP
+
+    TIP  shift, and go to state 94
+
+
+State 72
+
+   14 body_func: ID '(' ')' RTRNARROW . TIP body_instr
+
+    TIP  shift, and go to state 95
+
+
+State 73
+
+   16 func_params: func_params ',' . func_param
+
+    ID  shift, and go to state 52
+
+    func_param  go to state 96
+
+
+State 74
+
+   13 body_func: ID '(' func_params ')' . RTRNARROW TIP body_instr
+
+    RTRNARROW  shift, and go to state 97
+
+
+State 75
+
+   34 attribute: DECLATTR . object_attributes ';'
+
+    ID  shift, and go to state 10
+
+    params             go to state 98
+    param              go to state 12
+    object_attributes  go to state 99
+
+
+State 76
+
+   38 method: DECLMETHOD . body_method
+
+    ID  shift, and go to state 57
+
+    body_method  go to state 100
+
+
+State 77
+
+   26 object: DECLOBJECT ID '[' ']' .
+
+    $default  reduce using rule 26 (object)
+
+
+State 78
+
+   25 object: DECLOBJECT ID '[' inside_obj . ']'
+
+    ']'  shift, and go to state 101
+
+
+State 79
+
+   27 inside_obj: more_attributes .
+   29           | more_attributes . more_methods
+   31 more_attributes: more_attributes . attributes
+
+    DECLATTR    shift, and go to state 75
+    DECLMETHOD  shift, and go to state 76
+
+    $default  reduce using rule 27 (inside_obj)
+
+    attributes    go to state 102
+    attribute     go to state 81
+    more_methods  go to state 103
+    method        go to state 83
+
+
+State 80
+
+   30 more_attributes: attributes .
+   33 attributes: attributes . ',' attribute
+
+    ','  shift, and go to state 104
+
+    $default  reduce using rule 30 (more_attributes)
+
+
+State 81
+
+   32 attributes: attribute .
+
+    $default  reduce using rule 32 (attributes)
+
+
+State 82
+
+   28 inside_obj: more_methods .
+   37 more_methods: more_methods . method ';'
+
+    DECLMETHOD  shift, and go to state 76
+
+    $default  reduce using rule 28 (inside_obj)
+
+    method  go to state 105
+
+
+State 83
+
+   36 more_methods: method . ';'
+
+    ';'  shift, and go to state 106
+
+
+State 84
+
+   39 body_method: ID '(' . method_params ')' RTRNARROW TIP
+   40            | ID '(' . ')' RTRNARROW TIP
+
+    ID   shift, and go to state 107
+    ')'  shift, and go to state 108
+
+    method_params  go to state 109
+    method_param   go to state 110
+
+
+State 85
+
+   46 impl_method: IMPL body_method OF . ID body_instr
+
+    ID  shift, and go to state 111
+
+
+State 86
+
+   61 assigment: ID ASSIGN ID .
+
+    $default  reduce using rule 61 (assigment)
+
+
+State 87
+
+   62 assigment: ID ASSIGN NR .
+
+    $default  reduce using rule 62 (assigment)
+
+
+State 88
+
+   63 assigment: ID ASSIGN '"' . ID '"'
+   64          | ID ASSIGN '"' . NR '"'
+
+    ID  shift, and go to state 112
+    NR  shift, and go to state 113
+
+
+State 89
+
+   66 lista_apel: NR .
+
+    $default  reduce using rule 66 (lista_apel)
+
+
+State 90
+
+   65 assigment: ID '(' lista_apel . ')'
+   67 lista_apel: lista_apel . ',' NR
+
+    ','  shift, and go to state 114
+    ')'  shift, and go to state 115
+
+
+State 91
+
+   50 obj: ID ':' . ID '{' init_list '}'
+   51    | ID ':' . ID '{' '}'
+
+    ID  shift, and go to state 116
+
+
+State 92
+
+   49 some_objects: some_objects ',' . obj
+
+    ID  shift, and go to state 65
+
+    obj  go to state 117
+
+
+State 93
+
+   58 list: list statement ';' .
+
+    $default  reduce using rule 58 (list)
+
+
+State 94
+
+   17 func_param: ID ':' TIP .
+
+    $default  reduce using rule 17 (func_param)
+
+
+State 95
+
+   14 body_func: ID '(' ')' RTRNARROW TIP . body_instr
+
+    '{'  shift, and go to state 118
+
+    body_instr  go to state 119
+
+
+State 96
+
+   16 func_params: func_params ',' func_param .
+
+    $default  reduce using rule 16 (func_params)
+
+
+State 97
+
+   13 body_func: ID '(' func_params ')' RTRNARROW . TIP body_instr
+
+    TIP  shift, and go to state 120
+
+
+State 98
+
+    7 params: params . ',' param
+   35 object_attributes: params .
+
+    ','  shift, and go to state 22
+
+    $default  reduce using rule 35 (object_attributes)
+
+
+State 99
+
+   34 attribute: DECLATTR object_attributes . ';'
+
+    ';'  shift, and go to state 121
+
+
+State 100
+
+   38 method: DECLMETHOD body_method .
+
+    $default  reduce using rule 38 (method)
+
+
+State 101
+
+   25 object: DECLOBJECT ID '[' inside_obj ']' .
+
+    $default  reduce using rule 25 (object)
+
+
+State 102
+
+   31 more_attributes: more_attributes attributes .
+   33 attributes: attributes . ',' attribute
+
+    ','  shift, and go to state 104
+
+    $default  reduce using rule 31 (more_attributes)
+
+
+State 103
+
+   29 inside_obj: more_attributes more_methods .
+   37 more_methods: more_methods . method ';'
+
+    DECLMETHOD  shift, and go to state 76
+
+    $default  reduce using rule 29 (inside_obj)
+
+    method  go to state 105
+
+
+State 104
+
+   33 attributes: attributes ',' . attribute
+
+    DECLATTR  shift, and go to state 75
+
+    attribute  go to state 122
+
+
+State 105
+
+   37 more_methods: more_methods method . ';'
+
+    ';'  shift, and go to state 123
+
+
+State 106
+
+   36 more_methods: method ';' .
+
+    $default  reduce using rule 36 (more_methods)
+
+
+State 107
+
+   43 method_param: ID . ':' TIP
+
+    ':'  shift, and go to state 124
+
+
+State 108
+
+   40 body_method: ID '(' ')' . RTRNARROW TIP
+
+    RTRNARROW  shift, and go to state 125
+
+
+State 109
+
+   39 body_method: ID '(' method_params . ')' RTRNARROW TIP
+   42 method_params: method_params . ',' method_param
+
+    ','  shift, and go to state 126
+    ')'  shift, and go to state 127
+
+
+State 110
+
+   41 method_params: method_param .
+
+    $default  reduce using rule 41 (method_params)
+
+
+State 111
+
+   46 impl_method: IMPL body_method OF ID . body_instr
+
+    '{'  shift, and go to state 118
+
+    body_instr  go to state 128
+
+
+State 112
+
+   63 assigment: ID ASSIGN '"' ID . '"'
+
+    '"'  shift, and go to state 129
+
+
+State 113
+
+   64 assigment: ID ASSIGN '"' NR . '"'
+
+    '"'  shift, and go to state 130
+
+
+State 114
+
+   67 lista_apel: lista_apel ',' . NR
+
+    NR  shift, and go to state 131
+
+
+State 115
+
+   65 assigment: ID '(' lista_apel ')' .
+
+    $default  reduce using rule 65 (assigment)
+
+
+State 116
+
+   50 obj: ID ':' ID . '{' init_list '}'
+   51    | ID ':' ID . '{' '}'
+
+    '{'  shift, and go to state 132
+
+
+State 117
+
+   49 some_objects: some_objects ',' obj .
+
+    $default  reduce using rule 49 (some_objects)
+
+
+State 118
+
+   18 body_instr: '{' . list '}'
+   19           | '{' . '}'
+
+    ID      shift, and go to state 46
+    DECLAR  shift, and go to state 47
+    '}'     shift, and go to state 133
+
+    obj_init   go to state 48
+    list       go to state 134
+    statement  go to state 50
+    assigment  go to state 51
+
+
+State 119
+
+   14 body_func: ID '(' ')' RTRNARROW TIP body_instr .
+
+    $default  reduce using rule 14 (body_func)
+
+
+State 120
+
+   13 body_func: ID '(' func_params ')' RTRNARROW TIP . body_instr
+
+    '{'  shift, and go to state 118
+
+    body_instr  go to state 135
+
+
+State 121
+
+   34 attribute: DECLATTR object_attributes ';' .
+
+    $default  reduce using rule 34 (attribute)
+
+
+State 122
+
+   33 attributes: attributes ',' attribute .
+
+    $default  reduce using rule 33 (attributes)
+
+
+State 123
+
+   37 more_methods: more_methods method ';' .
+
+    $default  reduce using rule 37 (more_methods)
+
+
+State 124
+
+   43 method_param: ID ':' . TIP
+
+    TIP  shift, and go to state 136
+
+
+State 125
+
+   40 body_method: ID '(' ')' RTRNARROW . TIP
+
+    TIP  shift, and go to state 137
+
+
+State 126
+
+   42 method_params: method_params ',' . method_param
+
+    ID  shift, and go to state 107
+
+    method_param  go to state 138
+
+
+State 127
+
+   39 body_method: ID '(' method_params ')' . RTRNARROW TIP
+
+    RTRNARROW  shift, and go to state 139
+
+
+State 128
+
+   46 impl_method: IMPL body_method OF ID body_instr .
+
+    $default  reduce using rule 46 (impl_method)
+
+
+State 129
+
+   63 assigment: ID ASSIGN '"' ID '"' .
+
+    $default  reduce using rule 63 (assigment)
+
+
+State 130
+
+   64 assigment: ID ASSIGN '"' NR '"' .
+
+    $default  reduce using rule 64 (assigment)
+
+
+State 131
+
+   67 lista_apel: lista_apel ',' NR .
+
+    $default  reduce using rule 67 (lista_apel)
+
+
+State 132
+
+   50 obj: ID ':' ID '{' . init_list '}'
+   51    | ID ':' ID '{' . '}'
+
+    ID   shift, and go to state 140
+    NR   shift, and go to state 141
+    '}'  shift, and go to state 142
+
+    init_list  go to state 143
+    init_par   go to state 144
+
+
+State 133
+
+   19 body_instr: '{' '}' .
+
+    $default  reduce using rule 19 (body_instr)
+
+
+State 134
+
+   18 body_instr: '{' list . '}'
+   58 list: list . statement ';'
+
+    ID      shift, and go to state 46
+    DECLAR  shift, and go to state 47
+    '}'     shift, and go to state 145
+
+    obj_init   go to state 48
+    statement  go to state 69
+    assigment  go to state 51
+
+
+State 135
+
+   13 body_func: ID '(' func_params ')' RTRNARROW TIP body_instr .
+
+    $default  reduce using rule 13 (body_func)
+
+
+State 136
+
+   43 method_param: ID ':' TIP .
+
+    $default  reduce using rule 43 (method_param)
+
+
+State 137
+
+   40 body_method: ID '(' ')' RTRNARROW TIP .
+
+    $default  reduce using rule 40 (body_method)
+
+
+State 138
+
+   42 method_params: method_params ',' method_param .
+
+    $default  reduce using rule 42 (method_params)
+
+
+State 139
+
+   39 body_method: ID '(' method_params ')' RTRNARROW . TIP
+
+    TIP  shift, and go to state 146
+
+
+State 140
+
+   54 init_par: ID .
+
+    $default  reduce using rule 54 (init_par)
+
+
+State 141
+
+   55 init_par: NR .
+
+    $default  reduce using rule 55 (init_par)
+
+
+State 142
+
+   51 obj: ID ':' ID '{' '}' .
+
+    $default  reduce using rule 51 (obj)
+
+
+State 143
+
+   50 obj: ID ':' ID '{' init_list . '}'
+   53 init_list: init_list . ',' init_par
+
+    ','  shift, and go to state 147
+    '}'  shift, and go to state 148
+
+
+State 144
+
+   52 init_list: init_par .
+
+    $default  reduce using rule 52 (init_list)
+
+
+State 145
+
+   18 body_instr: '{' list '}' .
+
+    $default  reduce using rule 18 (body_instr)
+
+
+State 146
+
+   39 body_method: ID '(' method_params ')' RTRNARROW TIP .
+
+    $default  reduce using rule 39 (body_method)
+
+
+State 147
+
+   53 init_list: init_list ',' . init_par
+
+    ID  shift, and go to state 140
+    NR  shift, and go to state 141
+
+    init_par  go to state 149
+
+
+State 148
+
+   50 obj: ID ':' ID '{' init_list '}' .
+
+    $default  reduce using rule 50 (obj)
+
+
+State 149
+
+   53 init_list: init_list ',' init_par .
+
+    $default  reduce using rule 53 (init_list)
